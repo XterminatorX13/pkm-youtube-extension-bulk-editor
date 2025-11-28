@@ -1,51 +1,100 @@
-# YouTube Subscription Bulk Editor (Hybrid Version)
+# 📺 YouTube Bulk Editor (Hybrid Edition)
 
-![YouTube Bulk Editor](https://img.shields.io/badge/YouTube-Extension-red) ![Status](https://img.shields.io/badge/Status-Experimental-orange)
+<div align="center">
 
-Uma extensão poderosa e "híbrida" para gerenciar suas inscrições do YouTube em massa. Combina a melhor interface de usuário (Sidebar, Pastas) com uma lógica de "Smart Unsubscribe" robusta que evita bloqueios do YouTube.
+![Version](https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge&logo=youtube)
+![Status](https://img.shields.io/badge/status-stable-green?style=for-the-badge)
+![Security](https://img.shields.io/badge/security-audited-brightgreen?style=for-the-badge&logo=shield)
+![License](https://img.shields.io/badge/license-MIT-lightgrey?style=for-the-badge)
 
-## 🚀 Funcionalidades Principais
+**A ferramenta definitiva para limpar seu feed do YouTube.**
+*Sem APIs pagas. Sem bloqueios. Sem dor de cabeça.*
 
-### 🛡️ Smart Bulk Unsubscribe
-Diferente de outros scripts que tentam apagar tudo de uma vez e são bloqueados, esta extensão age como um "macro inteligente":
-*   **Delays Randomizados:** Espera entre 250ms e 500ms entre ações para simular comportamento humano.
-*   **Retry Logic:** Tenta encontrar os botões de confirmação múltiplas vezes caso o YouTube demore para carregar.
-*   **Smooth Scrolling:** Rola a página suavemente até o canal que está sendo processado.
-*   **Progress Overlay:** Uma tela de progresso visual com botão de **PARAR** para interromper o processo a qualquer momento.
+[Funcionalidades](#-funcionalidades) • [Instalação](#-instalação) • [Segurança](#-segurança) • [Store Upload](#-como-publicar)
 
-### 📂 Gerenciamento Avançado
-*   **Pastas:** Organize seus canais em pastas personalizadas.
-*   **Mini Modal de Seleção:** Clique no contador (ex: `3/216`) para ver e gerenciar exatamente quais canais você selecionou antes de apagar.
-*   **Exportar CSV:** Faça backup da sua lista de inscrições antes de fazer a limpa.
-*   **Auto-Scroll:** Carrega todos os seus canais automaticamente sem precisar ficar rolando a página manualmente.
-
-### 🎨 Interface Premium
-*   **Modo Híbrido:** Alterne entre visualização de Sidebar (lateral) ou Modal (central).
-*   **Busca em Tempo Real:** Filtre canais por nome instantaneamente.
-*   **Dark Mode Nativo:** Design que se integra perfeitamente ao tema escuro do YouTube.
-
-## 📦 Instalação
-
-Como esta é uma versão experimental/desenvolvedor, você precisa instalá-la manualmente:
-
-1.  Baixe este repositório como ZIP e extraia (ou faça um `git clone`).
-2.  Abra o Chrome/Edge/Brave e vá para `chrome://extensions`.
-3.  Ative o **Modo do Desenvolvedor** (canto superior direito).
-4.  Clique em **Carregar sem compactação** (Load unpacked).
-5.  Selecione a pasta onde você extraiu os arquivos.
-
-## 🛠️ Como Usar
-
-1.  Acesse [youtube.com/feed/channels](https://www.youtube.com/feed/channels).
-2.  Clique no botão flutuante (ícone de grade) no canto inferior direito.
-3.  **Dica:** Use o botão "Carregar Todos" para garantir que a extensão veja todas as suas inscrições.
-4.  Selecione os canais que deseja remover (ou organize em pastas).
-5.  Clique em **Cancelar Inscrição** e aguarde o processo terminar.
-
-## ⚠️ Aviso Importante
-
-Esta extensão usa automação de DOM (simula cliques). O YouTube pode alterar o layout do site a qualquer momento, o que pode quebrar a funcionalidade.
-**Use com responsabilidade.** O "Smart Unsubscribe" é lento de propósito para proteger sua conta.
+</div>
 
 ---
-Desenvolvido por **XterminatorX13**
+
+## 🚀 O Que É Isso?
+
+Cansado de ter 1.000 inscrições que você não assiste mais? O YouTube não te deixa apagar tudo de uma vez. **Nós deixamos.**
+
+Esta extensão é um "Frankenstein" (no bom sentido!) que combina:
+1.  **UX Premium:** Interface lateral elegante, pastas e modo noturno.
+2.  **Smart Core:** Um algoritmo de "unsubscribe" que age como um humano (pausas, rolagens) para evitar que sua conta seja marcada como spam.
+
+## ✨ Funcionalidades
+
+### 🛡️ Smart Unsubscribe (Anti-Ban)
+> "Não é um bug, é uma feature."
+O processo é intencionalmente "lento" (1-2s por canal). Por quê?
+*   **Human-Like Delays:** Espera aleatória entre ações (250ms - 500ms).
+*   **Scroll-to-View:** O script rola até o canal antes de clicar, simulando um usuário real.
+*   **Retry Logic:** Se o YouTube lagar, o script espera pacientemente.
+
+### 🎮 Controle Total
+*   **Progress Overlay:** Acompanhe o progresso com uma tela visual estilo "hacker".
+*   **Botão de Pânico:** Clicou em "PARAR"? O script para na hora.
+*   **Mini Modal:** Clique no contador (`3/216`) para ver exatamente quem vai pra vala.
+
+### 📂 Organização
+*   **Pastas:** Agrupe canais que você quer manter (ex: "Tech", "Games").
+*   **Export CSV:** Baixe sua lista completa antes de fazer a limpa. Backup é vida!
+*   **Auto-Scroll:** Carrega sua lista infinita sozinho.
+
+---
+
+## 📦 Instalação (Developer Mode)
+
+Como ainda não está na loja (veja abaixo como publicar!), instale assim:
+
+1.  **Clone/Baixe** este repositório.
+2.  Acesse `chrome://extensions` (Chrome/Brave/Edge) ou `about:debugging` (Firefox).
+3.  Ative o **Modo do Desenvolvedor**.
+4.  Clique em **Carregar sem compactação** (Load Unpacked).
+5.  Selecione a pasta do projeto.
+6.  Acesse [youtube.com/feed/channels](https://www.youtube.com/feed/channels) e divirta-se!
+
+---
+
+## 🔒 Segurança & Privacidade
+
+Levamos a segurança a sério. Aqui está o que fizemos:
+
+### ✅ Auditado
+*   **XSS Protection:** Todo texto renderizado (nomes de canais) é sanitizado (`escapeHTML`) para prevenir injeção de scripts maliciosos.
+*   **Manifest V3:** Atualizado para o novo padrão de segurança do Google, limitando permissões apenas ao necessário (`activeTab`, `storage`, `youtube.com`).
+*   **Sem Dados Externos:** Seus dados ficam no seu navegador (`localStorage`). Nada é enviado para servidores externos.
+
+### ⚠️ Aviso Legal
+Esta ferramenta automatiza ações do usuário. Embora tenhamos implementado proteções (delays), o uso excessivo (milhares de ações por dia) pode chamar atenção do YouTube. Use com moderação (ex: 100-200 por dia).
+
+---
+
+## 🚀 Como Publicar (Store Guide)
+
+Quer colocar isso na loja? Siga o guia:
+
+### 🟢 Chrome Web Store (CWS)
+1.  **Conta de Desenvolvedor:** Pague a taxa única de $5 USD.
+2.  **Zip:** Compacte a pasta do projeto (sem a pasta `.git`).
+3.  **Dashboard:** Vá para o [Chrome Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard).
+4.  **Upload:** Suba o ZIP.
+5.  **Privacidade:** Preencha a "Privacy Policy". Como não coletamos dados, é simples.
+    *   *Justificativa de Permissões:* Explique que `storage` é para salvar pastas locais e `activeTab` para injetar o script.
+6.  **Review:** Aguarde 1-3 dias.
+
+### 🦊 Firefox Add-ons (AMO)
+1.  **Conta:** Crie uma conta no [AMO Developer Hub](https://addons.mozilla.org/developers/).
+2.  **Zip:** O mesmo ZIP serve (o Firefox aceita Manifest V3 com algumas ressalvas, mas este projeto é compatível).
+3.  **Upload:** Suba como "Self-Hosted" (para assinar e distribuir você mesmo) ou "Hosted" (para aparecer na loja).
+4.  **Lint:** O validador automático vai checar o código. Se passar, vai para revisão humana.
+
+---
+
+<div align="center">
+
+**Feito com 💻 e ☕ por XterminatorX13**
+
+</div>

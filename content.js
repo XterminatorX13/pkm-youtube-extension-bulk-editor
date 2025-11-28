@@ -419,6 +419,16 @@
     debouncedUpdateUI()
   }
 
+  function escapeHTML(str) {
+    if (!str) return ""
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;")
+  }
+
   function renderFolderPreviewModal(folder) {
     const folderChannels = (folder.channels || []).map((id) => getChannelById(id)).filter(Boolean)
 
@@ -428,7 +438,7 @@
           <div class="yt-sub-folder-preview-header">
             <div class="yt-sub-folder-preview-title">
               <span class="yt-sub-folder-icon">${icons.folder}</span>
-              ${folder.name}
+              ${escapeHTML(folder.name)}
               <span class="yt-sub-badge">${folderChannels.length}</span>
             </div>
             <button class="yt-sub-btn-icon" data-close-folder-preview title="Fechar">${icons.close}</button>
@@ -442,7 +452,7 @@
                 <div class="yt-sub-mini-item ${selectedIds.has(ch.id) ? "selected" : ""}" data-id="${ch.id}">
                   <div class="yt-sub-checkbox-mini ${selectedIds.has(ch.id) ? "checked" : ""}">${icons.check}</div>
                   <img class="yt-sub-avatar-mini" src="${ch.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=random`}" alt="" />
-                  <span class="yt-sub-name-mini">${ch.name}</span>
+                  <span class="yt-sub-name-mini">${escapeHTML(ch.name)}</span>
                 </div>
               `,
           )
@@ -480,7 +490,7 @@
                   <div class="yt-sub-folder-card" data-open-folder-preview="${f.id}">
                     <div class="yt-sub-folder-card-header">
                       <span class="yt-sub-folder-icon">${icons.folder}</span>
-                      <span class="yt-sub-folder-card-name">${f.name}</span>
+                      <span class="yt-sub-folder-card-name">${escapeHTML(f.name)}</span>
                       <span class="yt-sub-badge">${folderChannels.length}</span>
                     </div>
                     <div class="yt-sub-folder-card-preview">
@@ -489,7 +499,7 @@
                 : previewChannels
                   .map(
                     (ch) => `
-                          <img class="yt-sub-folder-card-avatar" src="${ch.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=random`}" alt="${ch.name}" title="${ch.name}" />
+                          <img class="yt-sub-folder-card-avatar" src="${ch.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=random`}" alt="${escapeHTML(ch.name)}" title="${escapeHTML(ch.name)}" />
                         `,
                   )
                   .join("") +
@@ -531,7 +541,7 @@
             (ch) => `
                 <div class="yt-sub-mini-item">
                   <img class="yt-sub-avatar-mini" src="${ch.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=random`}" alt="" />
-                  <span class="yt-sub-name-mini">${ch.name}</span>
+                  <span class="yt-sub-name-mini">${escapeHTML(ch.name)}</span>
                   <button class="yt-sub-btn-icon yt-sub-remove-selection" data-remove-id="${ch.id}" title="Remover da seleção">
                     ${icons.close}
                   </button>
@@ -690,7 +700,7 @@
                     <div class="yt-sub-folder-header" data-toggle="${f.id}">
                       <span class="yt-sub-folder-chevron">${isExpanded ? icons.chevronDown : icons.chevronRight}</span>
                       <span class="yt-sub-folder-icon">${icons.folder}</span>
-                      <span class="yt-sub-folder-name">${f.name}</span>
+                      <span class="yt-sub-folder-name">${escapeHTML(f.name)}</span>
                       <span class="yt-sub-folder-badge">${folderChannels.length}</span>
                       <button class="yt-sub-btn-icon yt-sub-folder-delete" data-delete="${f.id}" title="Excluir pasta">${icons.trash}</button>
                     </div>
@@ -705,7 +715,7 @@
                             <div class="yt-sub-item yt-sub-item-sm ${selectedIds.has(ch.id) ? "selected" : ""}" data-id="${ch.id}">
                               <div class="yt-sub-checkbox ${selectedIds.has(ch.id) ? "checked" : ""}">${icons.check}</div>
                               <img class="yt-sub-avatar" src="${ch.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=random`}" alt="" />
-                              <span class="yt-sub-name">${ch.name}</span>
+                              <span class="yt-sub-name">${escapeHTML(ch.name)}</span>
                             </div>
                           `,
                     )
@@ -738,8 +748,8 @@
                     <div class="yt-sub-checkbox ${selectedIds.has(ch.id) ? "checked" : ""}">${icons.check}</div>
                     <img class="yt-sub-avatar" src="${ch.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=random`}" alt="" />
                     <div class="yt-sub-info">
-                      <span class="yt-sub-name">${ch.name}</span>
-                      ${ch.subscribers ? `<span class="yt-sub-subs">${ch.subscribers}</span>` : ""}
+                      <span class="yt-sub-name">${escapeHTML(ch.name)}</span>
+                      ${ch.subscribers ? `<span class="yt-sub-subs">${escapeHTML(ch.subscribers)}</span>` : ""}
                     </div>
                   </div>
                 `,
