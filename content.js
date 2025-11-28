@@ -19,6 +19,7 @@
   let showFolders = localStorage.getItem("yt-show-folders") !== "false"
   let folderPreviewOpen = null
   let foldersModalOpen = false
+  let selectionModalOpen = false
   let dropdownOpen = false
 
   // SVG Icons
@@ -510,6 +511,46 @@
     `
   }
 
+  function renderSelectionModal() {
+    const selectedChannels = channels.filter(c => selectedIds.has(c.id))
+
+    return `
+      <div class="yt-sub-folders-modal">
+        <div class="yt-sub-folders-modal-content">
+          <div class="yt-sub-folders-modal-header">
+            <div class="yt-sub-folders-modal-title">
+              ${icons.check} Selecionados (${selectedChannels.length})
+            </div>
+            <button class="yt-sub-btn-icon" data-close-selection-modal title="Fechar">${icons.close}</button>
+          </div>
+          <div class="yt-sub-folders-modal-list">
+            ${selectedChannels.length === 0
+        ? `<div class="yt-sub-empty-mini">Nenhum canal selecionado</div>`
+        : selectedChannels
+          .map(
+            (ch) => `
+                <div class="yt-sub-mini-item">
+                  <img class="yt-sub-avatar-mini" src="${ch.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(ch.name)}&background=random`}" alt="" />
+                  <span class="yt-sub-name-mini">${ch.name}</span>
+                  <button class="yt-sub-btn-icon yt-sub-remove-selection" data-remove-id="${ch.id}" title="Remover da seleção">
+                    ${icons.close}
+                  </button>
+                </div>
+              `,
+          )
+          .join("")
+      }
+          </div>
+          <div class="yt-sub-folder-preview-footer">
+            <button class="yt-sub-btn yt-sub-btn-danger yt-sub-btn-sm" id="yt-sub-clear-selection">
+              Limpar Seleção
+            </button>
+          </div>
+        </div>
+      </div>
+    `
+  }
+
   function renderDropdown() {
     return `
       <div class="yt-sub-dropdown ${dropdownOpen ? "open" : ""}">
@@ -623,7 +664,9 @@
           <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-select-all">
             ${selectedIds.size === filtered.length && filtered.length > 0 ? "Desmarcar" : "Selecionar"} Tudo
           </button>
-          <span class="yt-sub-count">${counterText}</span>
+          <button class="yt-sub-count" id="yt-sub-selection-trigger" title="Ver selecionados">
+            ${counterText}
+          </button>
         </div>
 
         <div class="yt-sub-search-wrap">
@@ -723,13 +766,14 @@
              ${icons.download} CSV
           </button>
           <button class="yt-sub-btn yt-sub-btn-danger" id="yt-sub-unsubscribe" ${selectedIds.size === 0 || isProcessing ? "disabled" : ""}>
-            ${icons.trash} Cancelar (${selectedIds.size})
+            ${icons.trash} Cancelar Inscrição (${selectedIds.size})
           </button>
         </div>
       </div>
 
       ${foldersModalOpen ? renderFoldersModal() : ""}
       ${folderPreviewOpen ? renderFolderPreviewModal(folders.find((f) => f.id === folderPreviewOpen)) : ""}
+      ${selectionModalOpen ? renderSelectionModal() : ""}
     `
 
     // Restaurar scroll
@@ -796,6 +840,37 @@
 
     // Export CSV
     document.querySelector("#yt-sub-export-csv")?.addEventListener("click", exportCSV)
+
+    // Selection Modal Trigger
+    document.querySelector("#yt-sub-selection-trigger")?.addEventListener("click", () => {
+      if (selectedIds.size > 0) {
+        selectionModalOpen = true
+        updateUI()
+      }
+    })
+
+    // Close Selection Modal
+    document.querySelector("[data-close-selection-modal]")?.addEventListener("click", () => {
+      selectionModalOpen = false
+      updateUI()
+    })
+
+    // Clear Selection
+    document.querySelector("#yt-sub-clear-selection")?.addEventListener("click", () => {
+      selectedIds.clear()
+      selectionModalOpen = false
+      updateUI()
+    })
+
+    // Remove item from selection modal
+    document.querySelectorAll(".yt-sub-remove-selection").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const id = btn.getAttribute("data-remove-id")
+        selectedIds.delete(id)
+        if (selectedIds.size === 0) selectionModalOpen = false
+        updateUI()
+      })
+    })
 
     // Delete folder from preview
     document.querySelectorAll("[data-delete-folder]").forEach((el) => {
@@ -906,10 +981,11 @@
       })
     })
 
-    // Mini item selection
+    // Mini item selection (APENAS para folder preview - não altera seleção, só visualiza)
     document.querySelectorAll(".yt-sub-mini-item[data-id]").forEach((el) => {
       el.addEventListener("click", () => {
         const id = el.getAttribute("data-id")
+        // Mini items apenas toggleiam a seleção visualmente
         if (selectedIds.has(id)) {
           selectedIds.delete(id)
         } else {
@@ -1688,6 +1764,31 @@
         background: #ff4e45;
         height: 100%;
         transition: width 0.3s;
+      }
+
+      /* Interactive Counter */
+      .yt-sub-count {
+        background: none;
+        border: none;
+        color: #aaa;
+        font-size: 12px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 12px;
+        transition: background 0.2s, color 0.2s;
+      }
+      .yt-sub-count:hover {
+        background: #3f3f3f;
+        color: #fff;
+      }
+
+      .yt-sub-remove-selection {
+        opacity: 0.6;
+        transition: opacity 0.2s;
+      }
+      .yt-sub-remove-selection:hover {
+        opacity: 1;
+        color: #ff4e45;
       }
     `
     document.head.appendChild(style)
