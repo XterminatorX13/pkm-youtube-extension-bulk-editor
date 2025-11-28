@@ -1,5 +1,5 @@
 // YouTube Subscription Bulk Editor - DOM Automation (sem OAuth)
-;(() => {
+; (() => {
   console.log("[v0] YouTube Sub Manager: Iniciando...")
 
   // State
@@ -46,7 +46,7 @@
       if (nameEl) {
         channels.push({
           id: `ch-${i}`,
-          name: nameEl.textContent?.trim() || "Canal",
+          name: nameEl.innerText?.trim() || "Canal",
           avatar: imgEl?.src || "",
           subscribers: subsEl?.textContent?.trim() || "",
           element: el,
@@ -117,8 +117,8 @@
             await sleep(500)
             const confirmBtn = document.querySelector(
               "yt-confirm-dialog-renderer #confirm-button button, " +
-                "#confirm-button yt-button-shape button, " +
-                'button[aria-label*="Cancelar inscrição"]',
+              "#confirm-button yt-button-shape button, " +
+              'button[aria-label*="Cancelar inscrição"]',
             )
 
             if (confirmBtn) {
@@ -255,9 +255,8 @@
         </div>
 
         <div class="yt-sub-list">
-          ${
-            filtered.length === 0
-              ? `
+          ${filtered.length === 0
+        ? `
             <div class="yt-sub-empty">
               <div>${icons.grid}</div>
               <p>Nenhum canal encontrado</p>
@@ -267,9 +266,9 @@
               </a>
             </div>
           `
-              : filtered
-                  .map(
-                    (ch) => `
+        : filtered
+          .map(
+            (ch) => `
             <div class="yt-sub-item ${selectedIds.has(ch.id) ? "selected" : ""}" data-id="${ch.id}">
               <div class="yt-sub-checkbox ${selectedIds.has(ch.id) ? "checked" : ""}">
                 ${icons.check}
@@ -282,19 +281,18 @@
               ${ch.href ? `<a href="${ch.href}" target="_blank" class="yt-sub-link">Ver canal</a>` : ""}
             </div>
           `,
-                  )
-                  .join("")
-          }
+          )
+          .join("")
+      }
         </div>
 
-        ${
-          folders.length > 0
-            ? `
+        ${folders.length > 0
+        ? `
           <div class="yt-sub-folders">
             <div class="yt-sub-folders-title">Suas Pastas</div>
             ${folders
-              .map(
-                (f) => `
+          .map(
+            (f) => `
               <div class="yt-sub-folder-item">
                 <span>${icons.folder}</span>
                 <span>${f.name}</span>
@@ -302,12 +300,12 @@
                 <button class="yt-sub-btn-icon yt-sub-folder-delete" data-folder="${f.id}">${icons.trash}</button>
               </div>
             `,
-              )
-              .join("")}
+          )
+          .join("")}
           </div>
         `
-            : ""
-        }
+        : ""
+      }
       </div>
     `
 
@@ -379,14 +377,14 @@
         
         <div class="yt-sub-modal-folders">
           ${folders
-            .map(
-              (f) => `
+        .map(
+          (f) => `
             <div class="yt-sub-modal-folder" data-id="${f.id}">
               ${icons.folder} ${f.name}
             </div>
           `,
-            )
-            .join("")}
+        )
+        .join("")}
         </div>
         
         <div class="yt-sub-modal-new">
