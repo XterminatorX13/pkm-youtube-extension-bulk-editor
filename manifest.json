@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+  "name": "YouTube Bulk Unsubscribe",
+  "version": "1.0.0",
+  "description": "Gerencie e cancele inscrições do YouTube em massa - sem OAuth necessário",
+  "permissions": ["activeTab", "storage", "*://*.youtube.com/*"],
+  "icons": {
+    "48": "icons/icon-48.jpg",
+    "96": "icons/icon-96.jpg"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "browser_action": {
+    "default_icon": {
+      "48": "icons/icon-48.jpg"
+    },
+    "default_title": "YouTube Bulk Editor"
+  }
+}
