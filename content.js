@@ -1,13 +1,13 @@
 // YouTube Subscription Bulk Editor - DOM Automation (sem OAuth)
 ; (() => {
-  console.log("[v0] YouTube Sub Manager: Iniciando...")
+  debugLog("YouTube Sub Manager: Iniciando...")
 
   // State
   let channels = []
-  let folders = JSON.parse(localStorage.getItem("yt-folders") || "[]")
+  let folders = safeGetLocalStorage("yt-folders", [])
   const selectedIds = new Set()
   let panelOpen = false
-  let viewMode = localStorage.getItem("yt-view-mode") || "sidebar"
+  let viewMode = safeGetLocalStorage("yt-view-mode", "sidebar")
   let isProcessing = false
   const expandedFolders = new Set()
   let scrollPosition = 0
@@ -15,8 +15,8 @@
   let isAutoScrolling = false
   let autoScrollProgress = { current: 0, total: 0, found: 0 }
 
-  let showChannels = localStorage.getItem("yt-show-channels") !== "false"
-  let showFolders = localStorage.getItem("yt-show-folders") !== "false"
+  let showChannels = safeGetLocalStorage("yt-show-channels", true) !== false
+  let showFolders = safeGetLocalStorage("yt-show-folders", true) !== false
   let folderPreviewOpen = null
   let foldersModalOpen = false
   let selectionModalOpen = false
@@ -44,21 +44,69 @@
     externalLink: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`,
   }
 
+  // Security: Safe localStorage wrappers with validation
+  const DEBUG = false // Set to false for production builds
+
+  function debugLog(...args) {
+    if (DEBUG) console.log("[YT-Bulk]", ...args)
+  }
+
+  function safeGetLocalStorage(key, defaultValue) {
+    try {
+      const value = localStorage.getItem(key)
+      if (value === null) return defaultValue
+      const parsed = JSON.parse(value)
+      // Additional validation for arrays
+      if (key === "yt-folders" && !Array.isArray(parsed)) {
+        debugLog(`Invalid data for ${key}, using default`)
+        return defaultValue
+      }
+      return parsed
+    } catch (e) {
+      console.error(`[Security] Failed to parse localStorage key: ${key}`, e)
+      return defaultValue
+    }
+  }
+
+  function safeSetLocalStorage(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value))
+      return true
+    } catch (e) {
+      console.error(`[Security] Failed to set localStorage key: ${key}`, e)
+      return false
+    }
+  }
+
   function saveFolders() {
-    localStorage.setItem("yt-folders", JSON.stringify(folders))
+    safeSetLocalStorage("yt-folders", folders)
   }
 
   function saveVisibility() {
-    localStorage.setItem("yt-show-channels", showChannels)
-    localStorage.setItem("yt-show-folders", showFolders)
+    safeSetLocalStorage("yt-show-channels", showChannels)
+    safeSetLocalStorage("yt-show-folders", showFolders)
   }
 
   function isOnChannelsPage() {
     return window.location.href.includes("/feed/channels")
   }
 
+  // Security: URL validation to prevent open redirect
+  function isValidYouTubeURL(url) {
+    if (!url) return false
+    try {
+      const parsed = new URL(url)
+      return parsed.hostname.endsWith('youtube.com') ||
+        parsed.hostname.endsWith('youtu.be') ||
+        parsed.hostname === 'youtube.com' ||
+        parsed.hostname === 'youtu.be'
+    } catch {
+      return false
+    }
+  }
+
   function scrapeChannels() {
-    console.log("[v0] Scraping canais...")
+    debugLog("Scraping canais...")
     const existingNames = new Set(channels.map((c) => c.name))
 
     const channelRenderers = document.querySelectorAll("ytd-channel-renderer, ytd-grid-channel-renderer")
@@ -92,7 +140,9 @@
         const link = el.querySelector("a")
         const name = el.querySelector("yt-formatted-string")?.innerText?.trim()
         const img = el.querySelector("img")?.src
-        if (name && link?.href?.includes("/@") && !existingNames.has(name)) {
+        const href = link?.href
+
+        if (name && href && isValidYouTubeURL(href) && href.includes("/@") && !existingNames.has(name)) {
           existingNames.add(name)
           channels.push({
             id: `sb-${i}`,
@@ -100,13 +150,13 @@
             avatar: img || "",
             subscribers: "",
             element: el,
-            href: link.href,
+            href: href,
           })
         }
       })
     }
 
-    console.log("[v0] Total de canais:", channels.length)
+    debugLog("Total de canais:", channels.length)
     return channels
   }
 
@@ -153,14 +203,14 @@
       // Verifica se encontrou novos
       if (channels.length === previousCount) {
         noNewChannels++
-        console.log(`[v0] Nenhum canal novo na tentativa ${noNewChannels}`)
+        debugLog(`Nenhum canal novo na tentativa ${noNewChannels}`)
         if (noNewChannels >= 3) {
-          console.log("[v0] Finalizando - sem novos canais")
+          debugLog("Finalizando - sem novos canais")
           break
         }
       } else {
         noNewChannels = 0
-        console.log(`[v0] Encontrados ${channels.length - previousCount} novos canais`)
+        debugLog(`Encontrados ${channels.length - previousCount} novos canais`)
       }
 
       previousCount = channels.length
@@ -177,7 +227,7 @@
 
   async function unsubscribeChannel(channel) {
     return new Promise(async (resolve) => {
-      console.log("[v0] Iniciando cancelamento para:", channel.name)
+      debugLog("Iniciando cancelamento para:", channel.name)
 
       // 1. Scroll suave para o canal (centralizado)
       if (channel.element) {
@@ -198,7 +248,7 @@
       )
 
       if (!subscribeContainer) {
-        console.log("[v0] Container não encontrado")
+        debugLog("Container não encontrado")
         resolve(false)
         return
       }
@@ -208,7 +258,7 @@
         subscribeContainer
 
       if (!subscribedBtn) {
-        console.log("[v0] Botão não encontrado")
+        debugLog("Botão não encontrado")
         resolve(false)
         return
       }
@@ -242,14 +292,14 @@
 
           if (confirmBtn) {
             confirmBtn.click()
-            console.log("[v0] Confirmado com sucesso!")
+            debugLog("Confirmado com sucesso!")
             resolveConfirm(true)
           } else {
             attempts++
             if (attempts < maxAttempts) {
               setTimeout(waitForConfirmationButton, 100)
             } else {
-              console.log("[v0] Timeout esperando confirmação")
+              debugLog("Timeout esperando confirmação")
               // Tenta fechar menu se falhou
               document.body.click()
               resolveConfirm(false)
