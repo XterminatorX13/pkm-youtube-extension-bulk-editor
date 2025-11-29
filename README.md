@@ -60,12 +60,32 @@ Como ainda não está na loja (veja abaixo como publicar!), instale assim:
 
 ## 🔒 Segurança & Privacidade
 
-Levamos a segurança a sério. Aqui está o que fizemos:
+Levamos a segurança a sério. Esta extensão passou por uma **auditoria de segurança completa** baseada em padrões OWASP 2024.
 
-### ✅ Auditado
-*   **XSS Protection:** Todo texto renderizado (nomes de canais) é sanitizado (`escapeHTML`) para prevenir injeção de scripts maliciosos.
-*   **Manifest V3:** Atualizado para o novo padrão de segurança do Google, limitando permissões apenas ao necessário (`activeTab`, `storage`, `youtube.com`).
-*   **Sem Dados Externos:** Seus dados ficam no seu navegador (`localStorage`). Nada é enviado para servidores externos.
+### ✅ Proteções Implementadas
+
+| Ameaça | Mitigação | Status |
+|--------|-----------|--------|
+| **XSS (Cross-Site Scripting)** | `escapeHTML()` sanitiza todos os dados dinâmicos | ✅ Implementado |
+| **Injeção de Dados** | localStorage com validação e try-catch | ✅ Implementado |
+| **Injeção de Código** | CSP restritivo (`script-src 'self'`) | ✅ Implementado |
+| **Open Redirect** | Validação de URLs do YouTube | ✅ Implementado |
+| **Information Disclosure** | Logs de debug desativados em produção | ✅ Implementado |
+
+### 🛡️ Padrões de Segurança
+
+- **Manifest V3:** Atualizado para o novo padrão de segurança do Google
+- **Permissões Mínimas:** Apenas `activeTab`, `storage`, e `youtube.com`
+- **Sem Dados Externos:** Tudo fica no seu navegador (`localStorage`)
+- **OWASP Compliant:** Segue as diretrizes do OWASP Browser Extension Security Project
+- **CSP Explícito:** Bloqueia scripts remotos e eval()
+
+### 📊 Relatório de Auditoria
+
+**Rating de Segurança:** ✅ **APROVADO PARA PRODUÇÃO**  
+**Compliance:** OWASP ✓ | Chrome Web Store ✓ | Firefox Add-ons ✓
+
+Detalhes completos no [Security Audit Report](https://github.com/XterminatorX13/pkm-youtube-extension-bulk-editor/blob/funcional-experimental-migration-version/SECURITY_AUDIT.md).
 
 ### ⚠️ Aviso Legal
 Esta ferramenta automatiza ações do usuário. Embora tenhamos implementado proteções (delays), o uso excessivo (milhares de ações por dia) pode chamar atenção do YouTube. Use com moderação (ex: 100-200 por dia).
