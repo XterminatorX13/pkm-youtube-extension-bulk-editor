@@ -361,6 +361,8 @@
     let success = 0
     let failed = 0
     let processed = 0
+    let consecutiveFailures = 0
+    const RATE_LIMIT_THRESHOLD = 3
 
     for (const channel of toUnsubscribe) {
       if (shouldStop) break
@@ -379,17 +381,41 @@
 
       if (result) {
         success++
+        consecutiveFailures = 0  // Reset on success
         selectedIds.delete(channel.id)
       } else {
         failed++
+        consecutiveFailures++
+
+        // Rate limit detection
+        if (consecutiveFailures >= RATE_LIMIT_THRESHOLD) {
+          overlay.querySelector(".yt-sub-progress-text").innerHTML = `
+            <strong style="color: #ff4e45;">⚠️ Possível Rate Limit Detectado</strong><br>
+            O YouTube pode estar bloqueando suas ações.<br>
+            <span style="font-size: 12px;">Aguarde 5-10 minutos antes de tentar novamente.</span><br><br>
+            <strong>Estatísticas:</strong><br>
+            ✅ Sucesso: ${success}<br>
+            ❌ Falhas: ${failed}
+          `
+          shouldStop = true
+          setTimeout(() => overlay.remove(), 8000)  // Auto-close after 8 seconds
+          break
+        }
       }
     }
 
     // Remover Overlay
-    overlay.remove()
+    if (!shouldStop || consecutiveFailures < RATE_LIMIT_THRESHOLD) {
+      overlay.remove()
+    }
 
     isProcessing = false
-    showToast(shouldStop ? "Processo interrompido!" : `Concluído: ${success} cancelados, ${failed} falhas`)
+
+    if (consecutiveFailures >= RATE_LIMIT_THRESHOLD) {
+      showToast("⚠️ Rate limit detectado - processo interrompido")
+    } else {
+      showToast(shouldStop ? "Processo interrompido!" : `Concluído: ${success} cancelados, ${failed} falhas`)
+    }
 
     // Limpa e re-scrapa
     channels = []
@@ -418,27 +444,187 @@
     return channels.find((c) => c.id === id)
   }
 
-  function exportCSV() {
+  function exportChannels(format = 'csv') {
     if (channels.length === 0) {
       showToast("Nenhum canal para exportar!")
       return
     }
 
-    const csvContent = [
-      ["Nome do Canal", "Inscritos", "Link"],
-      ...channels.map(c => [
-        `"${c.name.replace(/"/g, '""')}"`,
-        `"${c.subscribers}"`,
-        c.href || ""
-      ])
-    ].map(e => e.join(",")).join("\n")
+    const timestamp = new Date().toISOString().slice(0, 10)
+    let content, mimeType, filename
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    switch (format) {
+      case 'csv':
+        content = [
+          ["Nome do Canal", "Inscritos", "Link"],
+          ...channels.map(c => [
+            `"${c.name.replace(/"/g, '""')}"`,
+            `"${c.subscribers}"`,
+            c.href || ""
+          ])
+        ].map(e => e.join(",")).join("\n")
+        mimeType = "text/csv;charset=utf-8;"
+        filename = `youtube_subs_${timestamp}.csv`
+        break
+
+      case 'json':
+        const jsonData = {
+          exportDate: new Date().toISOString(),
+          totalChannels: channels.length,
+          folders: folders.map(f => ({
+            name: f.name,
+            channels: f.channels.map(chId => {
+              const ch = channels.find(c => c.id === chId)
+              return ch ? { name: ch.name, subscribers: ch.subscribers, href: ch.href } : null
+            }).filter(Boolean)
+          })),
+          channels: channels.map(c => ({
+            name: c.name,
+            subscribers: c.subscribers,
+            href: c.href
+          }))
+        }
+        content = JSON.stringify(jsonData, null, 2)
+        mimeType = "application/json;charset=utf-8;"
+        filename = `youtube_subs_${timestamp}.json`
+        break
+
+      case 'markdown':
+        // Markdown format for Obsidian/Notion
+        let md = `# YouTube Subscriptions\n\n`
+        md += `**Exported:** ${new Date().toLocaleString()}\n`
+        md += `**Total Channels:** ${channels.length}\n\n`
+
+        // Folders
+        if (folders.length > 0) {
+          md += `## 📁 Folders\n\n`
+          folders.forEach(f => {
+            md += `### ${f.name}\n\n`
+            f.channels.forEach(chId => {
+              const ch = channels.find(c => c.id === chId)
+              if (ch) {
+                md += `- [${ch.name}](${ch.href || '#'})${ch.subscribers ? ` - ${ch.subscribers}` : ''}\n`
+              }
+            })
+            md += `\n`
+          })
+        }
+
+        // All channels
+        md += `## 📺 All Channels\n\n`
+        md += `| Channel | Subscribers | Link |\n`
+        md += `|---------|-------------|------|\n`
+        channels.forEach(c => {
+          md += `| ${c.name.replace(/\|/g, '\\|')} | ${c.subscribers} | [Link](${c.href || '#'}) |\n`
+        })
+
+        content = md
+        mimeType = "text/markdown;charset=utf-8;"
+        filename = `youtube_subs_${timestamp}.md`
+        break
+    }
+
+    const blob = new Blob([content], { type: mimeType })
     const link = document.createElement("a")
     link.href = URL.createObjectURL(blob)
-    link.download = `youtube_subs_${new Date().toISOString().slice(0, 10)}.csv`
+    link.download = filename
     link.click()
-    showToast("Lista exportada com sucesso!")
+    showToast(`✅ Exportado como ${format.toUpperCase()}!`)
+  }
+
+  // Legacy function for backward compatibility
+  function exportCSV() {
+    exportChannels('csv')
+  }
+
+  function backupFolders() {
+    if (folders.length === 0) {
+      showToast("Nenhuma pasta para fazer backup!")
+      return
+    }
+
+    const data = {
+      version: "1.0.0",
+      exportDate: new Date().toISOString(),
+      folders: folders,
+      totalFolders: folders.length
+    }
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json;charset=utf-8;"
+    })
+    const link = document.createElement("a")
+    link.href = URL.createObjectURL(blob)
+    link.download = `youtube_folders_backup_${new Date().toISOString().slice(0, 10)}.json`
+    link.click()
+    showToast(`✅ Backup de ${folders.length} pastas criado!`)
+  }
+
+  function restoreFolders() {
+    const input = document.createElement("input")
+    input.type = "file"
+    input.accept = ".json"
+
+    input.onchange = (e) => {
+      const file = e.target.files[0]
+      if (!file) return
+
+      const reader = new FileReader()
+
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target.result)
+
+          // Validation
+          if (!data.folders || !Array.isArray(data.folders)) {
+            throw new Error("Formato inválido - faltando array 'folders'")
+          }
+
+          if (folders.length === 0) {
+            // No existing folders, just import
+            folders = data.folders
+            saveFolders()
+            updateUI()
+            showToast(`✅ ${data.folders.length} pastas restauradas!`)
+            return
+          }
+
+          // Ask user: merge or replace?
+          const shouldMerge = confirm(
+            `Encontradas ${data.folders.length} pastas no backup.\n\n` +
+            `Você tem ${folders.length} pastas atualmente.\n\n` +
+            `OK = ADICIONAR às pastas exist entes (merge)\n` +
+            `CANCELAR = SUBSTITUIR todas as pastas`
+          )
+
+          if (shouldMerge) {
+            // Merge: add only new folders (by ID)
+            let added = 0
+            data.folders.forEach(f => {
+              if (!folders.find(existing => existing.id === f.id)) {
+                folders.push(f)
+                added++
+              }
+            })
+            showToast(`✅ ${added} pastas adicionadas (${folders.length} total)`)
+          } else {
+            // Replace all
+            folders = data.folders
+            showToast(`✅ ${data.folders.length} pastas substituídas!`)
+          }
+
+          saveFolders()
+          updateUI()
+        } catch (err) {
+          console.error("[Security] Restore error:", err)
+          showToast(`❌ Erro ao restaurar: ${err.message}`)
+        }
+      }
+
+      reader.readAsText(file)
+    }
+
+    input.click()
   }
 
   function createNewFolder() {
@@ -822,9 +1008,28 @@
           <button class="yt-sub-btn yt-sub-btn-folder" id="yt-sub-new-folder" ${selectedIds.size === 0 ? "disabled" : ""}>
             ${icons.plus} Nova Pasta
           </button>
-          <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-export-csv" title="Exportar lista atual">
-             ${icons.download} CSV
-          </button>
+          
+          <div style="display: flex; gap: 4px;">
+            <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-export-csv" title="Exportar como CSV">
+               ${icons.download} CSV
+            </button>
+            <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-export-json" title="Exportar como JSON">
+               ${icons.download} JSON
+            </button>
+            <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-export-md" title="Exportar como Markdown (Obsidian/Notion)">
+               ${icons.download} MD
+            </button>
+          </div>
+          
+          <div style="display: flex; gap: 4px;">
+            <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-backup-folders" title="Backup de pastas">
+               💾 Backup
+            </button>
+            <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-restore-folders" title="Restaurar pastas">
+               📥 Restaurar
+            </button>
+          </div>
+          
           <button class="yt-sub-btn yt-sub-btn-danger" id="yt-sub-unsubscribe" ${selectedIds.size === 0 || isProcessing ? "disabled" : ""}>
             ${icons.trash} Cancelar Inscrição (${selectedIds.size})
           </button>
@@ -1057,6 +1262,15 @@
 
     // New folder
     document.querySelector("#yt-sub-new-folder")?.addEventListener("click", createNewFolder)
+
+    // Export formats
+    document.querySelector("#yt-sub-export-csv")?.addEventListener("click", () => exportChannels('csv'))
+    document.querySelector("#yt-sub-export-json")?.addEventListener("click", () => exportChannels('json'))
+    document.querySelector("#yt-sub-export-md")?.addEventListener("click", () => exportChannels('markdown'))
+
+    // Backup/Restore
+    document.querySelector("#yt-sub-backup-folders")?.addEventListener("click", backupFolders)
+    document.querySelector("#yt-sub-restore-folders")?.addEventListener("click", restoreFolders)
 
     // Unsubscribe
     document.querySelector("#yt-sub-unsubscribe")?.addEventListener("click", bulkUnsubscribe)
