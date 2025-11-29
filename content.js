@@ -1,5 +1,39 @@
 // YouTube Subscription Bulk Editor - DOM Automation (sem OAuth)
 ; (() => {
+  // Security: Safe localStorage wrappers with validation
+  const DEBUG = false // Set to false for production builds
+
+  function debugLog(...args) {
+    if (DEBUG) console.log("[YT-Bulk]", ...args)
+  }
+
+  function safeGetLocalStorage(key, defaultValue) {
+    try {
+      const value = localStorage.getItem(key)
+      if (value === null) return defaultValue
+      const parsed = JSON.parse(value)
+      // Additional validation for arrays
+      if (key === "yt-folders" && !Array.isArray(parsed)) {
+        debugLog(`Invalid data for ${key}, using default`)
+        return defaultValue
+      }
+      return parsed
+    } catch (e) {
+      console.error(`[Security] Failed to parse localStorage key: ${key}`, e)
+      return defaultValue
+    }
+  }
+
+  function safeSetLocalStorage(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value))
+      return true
+    } catch (e) {
+      console.error(`[Security] Failed to set localStorage key: ${key}`, e)
+      return false
+    }
+  }
+
   debugLog("YouTube Sub Manager: Iniciando...")
 
   // State
@@ -42,40 +76,6 @@
     download: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
     loader: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>`,
     externalLink: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`,
-  }
-
-  // Security: Safe localStorage wrappers with validation
-  const DEBUG = false // Set to false for production builds
-
-  function debugLog(...args) {
-    if (DEBUG) console.log("[YT-Bulk]", ...args)
-  }
-
-  function safeGetLocalStorage(key, defaultValue) {
-    try {
-      const value = localStorage.getItem(key)
-      if (value === null) return defaultValue
-      const parsed = JSON.parse(value)
-      // Additional validation for arrays
-      if (key === "yt-folders" && !Array.isArray(parsed)) {
-        debugLog(`Invalid data for ${key}, using default`)
-        return defaultValue
-      }
-      return parsed
-    } catch (e) {
-      console.error(`[Security] Failed to parse localStorage key: ${key}`, e)
-      return defaultValue
-    }
-  }
-
-  function safeSetLocalStorage(key, value) {
-    try {
-      localStorage.setItem(key, JSON.stringify(value))
-      return true
-    } catch (e) {
-      console.error(`[Security] Failed to set localStorage key: ${key}`, e)
-      return false
-    }
   }
 
   function saveFolders() {
