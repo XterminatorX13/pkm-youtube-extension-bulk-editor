@@ -1006,32 +1006,29 @@
 
         <div class="yt-sub-footer">
           <button class="yt-sub-btn yt-sub-btn-folder" id="yt-sub-new-folder" ${selectedIds.size === 0 ? "disabled" : ""}>
-            ${icons.plus} Nova Pasta
+            ${icons.plus} Pasta
           </button>
           
-          <div style="display: flex; gap: 4px;">
-            <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-export-csv" title="Exportar como CSV">
-               ${icons.download} CSV
+          <div style="display: flex; gap: 3px; flex-wrap: wrap;">
+            <button class="yt-sub-btn yt-sub-btn-xs" id="yt-sub-export-csv" title="Exportar CSV">
+               CSV
             </button>
-            <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-export-json" title="Exportar como JSON">
-               ${icons.download} JSON
+            <button class="yt-sub-btn yt-sub-btn-xs" id="yt-sub-export-json" title="Exportar JSON">
+               JSON
             </button>
-            <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-export-md" title="Exportar como Markdown (Obsidian/Notion)">
-               ${icons.download} MD
+            <button class="yt-sub-btn yt-sub-btn-xs" id="yt-sub-export-md" title="Exportar MD">
+               MD
             </button>
-          </div>
-          
-          <div style="display: flex; gap: 4px;">
-            <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-backup-folders" title="Backup de pastas">
-               💾 Backup
+            <button class="yt-sub-btn yt-sub-btn-xs" id="yt-sub-backup-folders" title="Backup">
+               💾
             </button>
-            <button class="yt-sub-btn yt-sub-btn-sm" id="yt-sub-restore-folders" title="Restaurar pastas">
-               📥 Restaurar
+            <button class="yt-sub-btn yt-sub-btn-xs" id="yt-sub-restore-folders" title="Restaurar">
+               📥
             </button>
           </div>
           
           <button class="yt-sub-btn yt-sub-btn-danger" id="yt-sub-unsubscribe" ${selectedIds.size === 0 || isProcessing ? "disabled" : ""}>
-            ${icons.trash} Cancelar Inscrição (${selectedIds.size})
+            ${icons.trash} Cancelar (${selectedIds.size})
           </button>
         </div>
       </div>
@@ -1340,30 +1337,8 @@
       }
       #yt-sub-panel.open { opacity: 1; visibility: visible; }
 
-      /* Sidebar mode */
-      #yt-sub-panel.yt-sub-panel-sidebar {
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 360px;
-        max-width: 100vw;
-      }
-      #yt-sub-panel.yt-sub-panel-sidebar .yt-sub-sidebar {
-        height: 100%;
-        border-left: 1px solid #272727;
-      }
-
       /* Modal mode */
       #yt-sub-panel.yt-sub-panel-modal {
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0,0,0,0.7);
-        padding: 20px;
       }
       #yt-sub-panel.yt-sub-panel-modal .yt-sub-sidebar {
         width: 420px;
@@ -1501,12 +1476,26 @@
         border: none;
         background: #272727;
         color: #f1f1f1;
-        transition: background 0.2s;
+        transition: background 0.2s, transform 0.1s;
       }
-      .yt-sub-btn:hover:not(:disabled) { background: #3f3f3f; }
-      .yt-sub-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-      .yt-sub-btn svg { width: 14px; height: 14px; }
-      .yt-sub-btn-sm { padding: 6px 10px; font-size: 12px; }
+      .yt-sub-btn:hover { background: #3f3f3f; transform: translateY(-1px); }
+      .yt-sub-btn:active { transform: translateY(0); }
+      .yt-sub-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+      .yt-sub-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+      
+      .yt-sub-btn-xs {
+        padding: 5px 10px;
+        font-size: 12px;
+        gap: 4px;
+      }
+      .yt-sub-btn-xs svg { width: 12px; height: 12px; }
+
+      .yt-sub-btn-sm { padding: 6px 12px; font-size: 12px; }
+      .yt-sub-btn-sm svg { width: 13px; height: 13px; }
 
       /* Botão de carregar todos */
       .yt-sub-btn-load {
