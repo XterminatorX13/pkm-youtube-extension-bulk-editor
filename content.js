@@ -593,7 +593,7 @@
           const shouldMerge = confirm(
             `Encontradas ${data.folders.length} pastas no backup.\n\n` +
             `Você tem ${folders.length} pastas atualmente.\n\n` +
-            `OK = ADICIONAR às pastas exist entes (merge)\n` +
+            `OK = ADICIONAR às pastas existentes (merge)\n` +
             `CANCELAR = SUBSTITUIR todas as pastas`
           )
 
