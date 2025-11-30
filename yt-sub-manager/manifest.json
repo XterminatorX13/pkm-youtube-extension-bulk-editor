@@ -1,11 +1,27 @@
 {
-  "manifest_version": 2,
-  "name": "YT Subscription Manager",
-  "version": "1.0",
-  "description": "Gerencie inscrições em massa",
+  "manifest_version": 3,
+  "name": "YT Bulk Manager",
+  "version": "1.0.0",
+  "description": "Gerencie e cancele inscrições do YouTube em massa - sem OAuth necessário",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*"],
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
       "js": [
         "1-main.js",
         "2-dom.js",
@@ -15,10 +31,13 @@
         "6-events.js",
         "7-styles.js"
       ],
-      "run_at": "document_idle"
+      "run_at": "document_end"
     }
   ],
-  "permissions": [
-    "storage"
-  ]
+  "action": {
+    "default_icon": {
+      "48": "icons/icon-48.png"
+    },
+    "default_title": "YouTube Bulk Editor"
+  }
 }
