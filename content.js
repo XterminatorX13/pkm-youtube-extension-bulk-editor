@@ -42,6 +42,7 @@
   const selectedIds = new Set()
   let panelOpen = false
   let viewMode = safeGetLocalStorage("yt-view-mode", "sidebar")
+  let sidebarPosition = safeGetLocalStorage("yt-sidebar-position", "right") // left, right
   let isProcessing = false
   const expandedFolders = new Set()
   let scrollPosition = 0
@@ -55,6 +56,7 @@
   let foldersModalOpen = false
   let selectionModalOpen = false
   let dropdownOpen = false
+  let exportDropdownOpen = false
 
   // SVG Icons
   const icons = {
@@ -822,6 +824,67 @@
     `
   }
 
+  function renderDropdown() {
+    return `
+      <div class="yt-sub-dropdown" style="position: relative;">
+        <button class="yt-sub-btn-icon" data-toggle-dropdown title="Configurações">
+          ${icons.settings}
+        </button>
+        ${dropdownOpen
+        ? `
+          <div class="yt-sub-dropdown-menu">
+            <button class="yt-sub-dropdown-item" data-toggle-channels>
+              ${showChannels ? icons.eyeOff : icons.eye} ${showChannels ? "Ocultar" : "Mostrar"} Canais
+            </button>
+            <button class="yt-sub-dropdown-item" data-toggle-folders>
+              ${showFolders ? icons.eyeOff : icons.eye} ${showFolders ? "Ocultar" : "Mostrar"} Pastas
+            </button>
+            <div class="yt-sub-dropdown-divider"></div>
+            <button class="yt-sub-dropdown-item" data-toggle-view>
+              ${viewMode === "sidebar" ? icons.expand : icons.list} Modo ${viewMode === "sidebar" ? "Modal" : "Sidebar"}
+            </button>
+            ${viewMode === "sidebar" ? `
+              <button class="yt-sub-dropdown-item" data-toggle-position>
+                ${sidebarPosition === "right" ? "◀" : "▶"} Sidebar ${sidebarPosition === "right" ? "Esquerda" : "Direita"}
+              </button>
+            ` : ""}
+          </div>
+          `
+        : ""
+      }
+      </div>
+      
+      <div class="yt-sub-dropdown" style="position: relative;">
+        <button class="yt-sub-btn-icon" data-toggle-export-dropdown title="Exportar">
+          ${icons.download}
+        </button>
+        ${exportDropdownOpen
+        ? `
+          <div class="yt-sub-dropdown-menu">
+            <button class="yt-sub-dropdown-item" data-export="csv">
+              ${icons.download} Exportar CSV
+            </button>
+            <button class="yt-sub-dropdown-item" data-export="json">
+              ${icons.download} Exportar JSON
+            </button>
+            <button class="yt-sub-dropdown-item" data-export="markdown">
+              ${icons.download} Exportar MD
+            </button>
+            <div class="yt-sub-dropdown-divider"></div>
+            <button class="yt-sub-dropdown-item" data-backup-folders>
+              💾 Backup Pastas
+            </button>
+            <button class="yt-sub-dropdown-item" data-restore-folders>
+              📥 Restaurar Pastas
+            </button>
+          </div>
+          `
+        : ""
+      }
+      </div>
+    `
+  }
+
   function updateUIInternal() {
     let panel = document.querySelector("#yt-sub-panel")
 
@@ -844,7 +907,8 @@
       document.body.appendChild(panel)
     }
 
-    panel.className = `yt-sub-panel-${viewMode}`
+    const positionClass = viewMode === "sidebar" ? `yt-sub-position-${sidebarPosition}` : ""
+    panel.className = `yt-sub-panel-${viewMode} ${positionClass}`
     panel.classList.add("open")
 
     const filtered = channels
@@ -1006,26 +1070,8 @@
 
         <div class="yt-sub-footer">
           <button class="yt-sub-btn yt-sub-btn-folder" id="yt-sub-new-folder" ${selectedIds.size === 0 ? "disabled" : ""}>
-            ${icons.plus} Pasta
+            ${icons.plus} Nova Pasta
           </button>
-          
-          <div style="display: flex; gap: 3px; flex-wrap: wrap;">
-            <button class="yt-sub-btn yt-sub-btn-xs" id="yt-sub-export-csv" title="Exportar CSV">
-               CSV
-            </button>
-            <button class="yt-sub-btn yt-sub-btn-xs" id="yt-sub-export-json" title="Exportar JSON">
-               JSON
-            </button>
-            <button class="yt-sub-btn yt-sub-btn-xs" id="yt-sub-export-md" title="Exportar MD">
-               MD
-            </button>
-            <button class="yt-sub-btn yt-sub-btn-xs" id="yt-sub-backup-folders" title="Backup">
-               💾
-            </button>
-            <button class="yt-sub-btn yt-sub-btn-xs" id="yt-sub-restore-folders" title="Restaurar">
-               📥
-            </button>
-          </div>
           
           <button class="yt-sub-btn yt-sub-btn-danger" id="yt-sub-unsubscribe" ${selectedIds.size === 0 || isProcessing ? "disabled" : ""}>
             ${icons.trash} Cancelar (${selectedIds.size})
@@ -1261,22 +1307,56 @@
     document.querySelector("#yt-sub-new-folder")?.addEventListener("click", createNewFolder)
 
     // Export formats
-    document.querySelector("#yt-sub-export-csv")?.addEventListener("click", () => exportChannels('csv'))
-    document.querySelector("#yt-sub-export-json")?.addEventListener("click", () => exportChannels('json'))
-    document.querySelector("#yt-sub-export-md")?.addEventListener("click", () => exportChannels('markdown'))
+    // Export dropdown toggle
+    document.querySelector("[data-toggle-export-dropdown]")?.addEventListener("click", (e) => {
+      e.stopPropagation()
+      exportDropdownOpen = !exportDropdownOpen
+      dropdownOpen = false  // Close other dropdown
+      updateUI()
+    })
 
-    // Backup/Restore
-    document.querySelector("#yt-sub-backup-folders")?.addEventListener("click", backupFolders)
-    document.querySelector("#yt-sub-restore-folders")?.addEventListener("click", restoreFolders)
+    // Export actions
+    document.querySelectorAll("[data-export]").forEach(el => {
+      el.addEventListener("click", () => {
+        const format = el.getAttribute("data-export")
+        exportChannels(format)
+        exportDropdownOpen = false
+        updateUI()
+      })
+    })
+
+    // Backup/Restore from dropdown
+    document.querySelector("[data-backup-folders]")?.addEventListener("click", () => {
+      backupFolders()
+      exportDropdownOpen = false
+      updateUI()
+    })
+    document.querySelector("[data-restore-folders]")?.addEventListener("click", () => {
+      restoreFolders()
+      exportDropdownOpen = false
+      updateUI()
+    })
+
+    // Sidebar position toggle
+    document.querySelector("[data-toggle-position]")?.addEventListener("click", () => {
+      sidebarPosition = sidebarPosition === "right" ? "left" : "right"
+      safeSetLocalStorage("yt-sidebar-position", sidebarPosition)
+      dropdownOpen = false
+      updateUI()
+    })
 
     // Unsubscribe
     document.querySelector("#yt-sub-unsubscribe")?.addEventListener("click", bulkUnsubscribe)
 
     // Close dropdown when clicking outside
     document.addEventListener("click", (e) => {
-      if (dropdownOpen && !e.target.closest(".yt-sub-dropdown")) {
-        dropdownOpen = false
-        updateUI()
+      const clickedDropdown = e.target.closest(".yt-sub-dropdown")
+      if (!clickedDropdown) {
+        if (dropdownOpen || exportDropdownOpen) {
+          dropdownOpen = false
+          exportDropdownOpen = false
+          updateUI()
+        }
       }
     })
   }
@@ -1337,8 +1417,43 @@
       }
       #yt-sub-panel.open { opacity: 1; visibility: visible; }
 
-      /* Modal mode */
+      /* Sidebar mode - Right */
+      #yt-sub-panel.yt-sub-panel-sidebar.yt-sub-position-right {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 360px;
+        max-width: 100vw;
+      }
+      #yt-sub-panel.yt-sub-panel-sidebar.yt-sub-position-right .yt-sub-sidebar {
+        height: 100%;
+        border-left: 1px solid #272727;
+      }
+
+      /* Sidebar mode - Left */
+      #yt-sub-panel.yt-sub-panel-sidebar.yt-sub-position-left {
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 360px;
+        max-width: 100vw;
+      }
+      #yt-sub-panel.yt-sub-panel-sidebar.yt-sub-position-left .yt-sub-sidebar {
+        height: 100%;
+        border-right: 1px solid #272727;
+      }
+
+      /* Modal mode - Centered */
       #yt-sub-panel.yt-sub-panel-modal {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.7);
+        padding: 20px;
       }
       #yt-sub-panel.yt-sub-panel-modal .yt-sub-sidebar {
         width: 420px;
@@ -1346,6 +1461,7 @@
         max-height: 85vh;
         border-radius: 12px;
         border: 1px solid #272727;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.6);
       }
       
       /* Compact mode quando canais estão ocultos */
@@ -1565,16 +1681,8 @@
         padding: 4px 0;
         min-width: 180px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-8px);
-        transition: all 0.2s;
         z-index: 100;
-      }
-      .yt-sub-dropdown.open .yt-sub-dropdown-menu {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(4px);
+        margin-top: 4px;
       }
       .yt-sub-dropdown-item {
         display: flex;
