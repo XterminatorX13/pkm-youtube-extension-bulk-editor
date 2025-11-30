@@ -99,36 +99,11 @@ function createFAB() {
             }
         }
         debouncedUpdateUI();
-    });
 
-    document.body.appendChild(fab);
-}
-
-// === SPA OBSERVER (YouTube navigation) ===
-function setupSPAObserver() {
-    let lastUrl = location.href;
-
-    new MutationObserver(() => {
-        const url = location.href;
-        if (url !== lastUrl) {
-            lastUrl = url;
-            debugLog("URL changed:", url);
-
-            // Reset channels quando muda de página
-            if (!url.includes("/feed/channels")) {
-                channels = [];
-            } else {
-                setTimeout(() => {
-                    if (window.YTSub.dom?.scrapeChannels) {
-                        window.YTSub.dom.scrapeChannels();
-                    }
-                }, 1500);
-            }
-
-            if (panelOpen) {
-                debouncedUpdateUI();
-            }
+        if (panelOpen) {
+            debouncedUpdateUI();
         }
+    }
     }).observe(document, { subtree: true, childList: true });
 }
 
