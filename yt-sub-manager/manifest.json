@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+  "name": "YT Subscription Manager",
+  "version": "1.0",
+  "description": "Gerencie inscrições em massa",
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": [
+        "1-main.js",
+        "2-dom.js",
+        "3-folders.js",
+        "4-export.js",
+        "5-ui.js",
+        "6-events.js",
+        "7-styles.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "storage"
+  ]
+}
