@@ -512,6 +512,29 @@
         font-size: 11px;
       }
 
+      .yt-sub-channel-link {
+        color: #3ea6ff;
+        text-decoration: none;
+        padding: 6px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, color 0.2s;
+        opacity: 0;
+      }
+      .yt-sub-channel-link svg {
+        width: 14px;
+        height: 14px;
+      }
+      .yt-sub-item:hover .yt-sub-channel-link {
+        opacity: 1;
+      }
+      .yt-sub-channel-link:hover {
+        background: rgba(62,166,255,0.1);
+        color: #63b3ed;
+      }
+
       .yt-sub-empty {
         color: #717171;
         font-size: 13px;

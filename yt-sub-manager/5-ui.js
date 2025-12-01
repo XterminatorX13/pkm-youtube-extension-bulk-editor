@@ -367,6 +367,7 @@
                       <span class="yt-sub-name">${escapeHTML(ch.name)}</span>
                       ${ch.subscribers ? `<span class="yt-sub-subs">${escapeHTML(ch.subscribers)}</span>` : ""}
                     </div>
+                    ${ch.href ? `<a href="${ch.href}" target="_blank" class="yt-sub-channel-link" title="Abrir canal" onclick="event.stopPropagation()">${icons.externalLink}</a>` : ""}
                   </div>
                 `,
             )
