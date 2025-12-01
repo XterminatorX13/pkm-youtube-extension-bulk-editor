@@ -253,6 +253,26 @@
             updateUI()
         })
 
+        // Folder tag click → expand and scroll to folder
+        document.querySelectorAll(".yt-sub-folder-tag").forEach(tag => {
+            tag.addEventListener("click", (e) => {
+                e.stopPropagation() // Don't select channel
+                const folderId = tag.getAttribute("data-folder-id")
+
+                // Expand folder
+                state.expandedFolders.add(folderId)
+                updateUI()
+
+                // Scroll to folder after UI updates
+                setTimeout(() => {
+                    const folderEl = document.querySelector(`[data-folder-id="${folderId}"]`)
+                    if (folderEl) {
+                        folderEl.scrollIntoView({ behavior: "smooth", block: "center" })
+                    }
+                }, 100)
+            })
+        })
+
         // Unsubscribe
         document.querySelector("#yt-sub-unsubscribe")?.addEventListener("click", () => {
             if (bulkUnsubscribe) bulkUnsubscribe()

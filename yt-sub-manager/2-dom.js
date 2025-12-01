@@ -34,6 +34,7 @@
             const imgEl = el.querySelector("#avatar img, yt-img-shadow img")
             const subsEl = el.querySelector("#subscribers, #subscriber-count")
             const subscribeBtn = el.querySelector("ytd-subscribe-button-renderer, #subscribe-button")
+            const linkEl = el.querySelector("a#channel-title, ytd-channel-name a, a[href*='/@'], a[href*='/channel/']")
 
             if (nameEl) {
                 const name = nameEl.innerText?.trim() || "Canal"
@@ -46,6 +47,7 @@
                         subscribers: subsEl?.innerText?.trim() || "",
                         element: el,
                         subscribeBtn: subscribeBtn,
+                        href: linkEl?.href || "",
                     })
                 }
             }

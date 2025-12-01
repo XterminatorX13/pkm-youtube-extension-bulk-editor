@@ -7,6 +7,11 @@
   const { exportChannels } = window.YTSubExport || {}
   const { t } = window.YTSubI18n
 
+  // Helper: Get all folders that contain a specific channel
+  function getChannelFolders(channelId) {
+    return state.folders.filter(f => f.channels?.includes(channelId))
+  }
+
   function renderFolderPreviewModal(folder) {
     const folderChannels = (folder.channels || []).map((id) => getChannelById(id)).filter(Boolean)
 
@@ -367,6 +372,15 @@
                       <span class="yt-sub-name">${escapeHTML(ch.name)}</span>
                       ${ch.subscribers ? `<span class="yt-sub-subs">${escapeHTML(ch.subscribers)}</span>` : ""}
                     </div>
+                    ${getChannelFolders(ch.id).length > 0 ? `
+                      <div class="yt-sub-folder-tags">
+                        ${getChannelFolders(ch.id).map(folder => `
+                          <span class="yt-sub-folder-tag" data-folder-id="${folder.id}" title="Clique para ver pasta">
+                            📁 ${escapeHTML(folder.name)}
+                          </span>
+                        `).join('')}
+                      </div>
+                    ` : ''}
                     ${ch.href ? `<a href="${ch.href}" target="_blank" class="yt-sub-channel-link" title="Abrir canal" onclick="event.stopPropagation()">${icons.externalLink}</a>` : ""}
                   </div>
                 `,

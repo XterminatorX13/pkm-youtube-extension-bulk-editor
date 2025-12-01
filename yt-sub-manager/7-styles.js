@@ -535,6 +535,37 @@
         color: #63b3ed;
       }
 
+      .yt-sub-folder-tags {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .yt-sub-folder-tag {
+        background: rgba(62,166,255,0.15);
+        color: #3ea6ff;
+        font-size: 10px;
+        padding: 3px 7px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid rgba(62,166,255,0.3);
+        white-space: nowrap;
+        user-select: none;
+      }
+
+      .yt-sub-folder-tag:hover {
+        background: rgba(62,166,255,0.28);
+        border-color: rgba(62,166,255,0.5);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      }
+
+      .yt-sub-folder-tag:active {
+        transform: translateY(0);
+      }
+
       .yt-sub-empty {
         color: #717171;
         font-size: 13px;
