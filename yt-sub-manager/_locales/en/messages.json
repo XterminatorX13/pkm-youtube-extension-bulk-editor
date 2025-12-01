@@ -1,0 +1,182 @@
+{
+    "loading": {
+        "message": "Loading..."
+    },
+    "processing": {
+        "message": "Processing..."
+    },
+    "cancel": {
+        "message": "Cancel"
+    },
+    "confirm": {
+        "message": "Confirm"
+    },
+    "close": {
+        "message": "Close"
+    },
+    "error": {
+        "message": "Error"
+    },
+    "success": {
+        "message": "Success"
+    },
+    "subscriptions": {
+        "message": "Subscriptions"
+    },
+    "search_placeholder": {
+        "message": "Search channels..."
+    },
+    "refresh_channels": {
+        "message": "Reload channels"
+    },
+    "load_all": {
+        "message": "Load All"
+    },
+    "loading_progress": {
+        "message": "Loading {current}/{total}"
+    },
+    "folders_btn": {
+        "message": "Folders"
+    },
+    "select_all": {
+        "message": "Select All"
+    },
+    "deselect_all": {
+        "message": "Deselect All"
+    },
+    "warning_page": {
+        "message": "To load all channels, go to the subscriptions page:"
+    },
+    "settings": {
+        "message": "Settings"
+    },
+    "show_channels": {
+        "message": "Show Channels"
+    },
+    "hide_channels": {
+        "message": "Hide Channels"
+    },
+    "show_folders": {
+        "message": "Show Folders"
+    },
+    "hide_folders": {
+        "message": "Hide Folders"
+    },
+    "mode_modal": {
+        "message": "Modal Mode"
+    },
+    "mode_sidebar": {
+        "message": "Sidebar Mode"
+    },
+    "sidebar_left": {
+        "message": "Sidebar Left"
+    },
+    "sidebar_right": {
+        "message": "Sidebar Right"
+    },
+    "export_btn": {
+        "message": "Export"
+    },
+    "export_csv": {
+        "message": "Export CSV"
+    },
+    "export_json": {
+        "message": "Export JSON"
+    },
+    "export_md": {
+        "message": "Export MD"
+    },
+    "backup_folders": {
+        "message": "Backup Folders"
+    },
+    "restore_folders": {
+        "message": "Restore Folders"
+    },
+    "new_folder": {
+        "message": "New Folder"
+    },
+    "folder_empty": {
+        "message": "Empty folder"
+    },
+    "delete_folder": {
+        "message": "Delete Folder"
+    },
+    "my_folders": {
+        "message": "My Folders"
+    },
+    "no_folders": {
+        "message": "No folders created"
+    },
+    "folder_name_prompt": {
+        "message": "New folder name:"
+    },
+    "selected_title": {
+        "message": "Selected ({count})"
+    },
+    "no_selection": {
+        "message": "No channels selected"
+    },
+    "remove_selection": {
+        "message": "Remove from selection"
+    },
+    "clear_selection": {
+        "message": "Clear Selection"
+    },
+    "unsubscribe_btn": {
+        "message": "Unsubscribe ({count})"
+    },
+    "toast_loaded": {
+        "message": "{count} channels loaded"
+    },
+    "toast_go_to_feed": {
+        "message": "Go to youtube.com/feed/channels first!"
+    },
+    "toast_backup_success": {
+        "message": "Backup of {count} folders created!"
+    },
+    "toast_restore_success": {
+        "message": "{count} folders restored!"
+    },
+    "toast_export_success": {
+        "message": "Exported as {format}!"
+    },
+    "toast_folder_deleted": {
+        "message": "Folder deleted"
+    },
+    "toast_no_channels": {
+        "message": "No channels to export!"
+    },
+    "confirm_unsubscribe": {
+        "message": "Are you sure you want to unsubscribe from {count} channel(s)?\n\nThis cannot be undone!"
+    },
+    "confirm_delete_folder": {
+        "message": "Delete this folder?"
+    },
+    "progress_unsubscribing": {
+        "message": "Unsubscribing..."
+    },
+    "progress_starting": {
+        "message": "Starting..."
+    },
+    "progress_stopping": {
+        "message": "Stopping..."
+    },
+    "progress_stop_btn": {
+        "message": "STOP"
+    },
+    "progress_rate_limit": {
+        "message": "⚠️ Possible Rate Limit Detected"
+    },
+    "progress_rate_limit_desc": {
+        "message": "YouTube might be blocking your actions. Wait 5-10 minutes."
+    },
+    "progress_stats": {
+        "message": "✅ Success: {success}<br>❌ Failed: {failed}"
+    },
+    "empty_channels": {
+        "message": "No channels found. Click \"Load All\" to fetch."
+    },
+    "channels_hidden": {
+        "message": "Channels hidden"
+    }
+}

@@ -1,0 +1,182 @@
+{
+    "loading": {
+        "message": "Carregando..."
+    },
+    "processing": {
+        "message": "Processando..."
+    },
+    "cancel": {
+        "message": "Cancelar"
+    },
+    "confirm": {
+        "message": "Confirmar"
+    },
+    "close": {
+        "message": "Fechar"
+    },
+    "error": {
+        "message": "Erro"
+    },
+    "success": {
+        "message": "Sucesso"
+    },
+    "subscriptions": {
+        "message": "Inscrições"
+    },
+    "search_placeholder": {
+        "message": "Pesquisar canais..."
+    },
+    "refresh_channels": {
+        "message": "Recarregar canais"
+    },
+    "load_all": {
+        "message": "Carregar Todos"
+    },
+    "loading_progress": {
+        "message": "Carregando {current}/{total}"
+    },
+    "folders_btn": {
+        "message": "Pastas"
+    },
+    "select_all": {
+        "message": "Selecionar Tudo"
+    },
+    "deselect_all": {
+        "message": "Desmarcar Tudo"
+    },
+    "warning_page": {
+        "message": "Para carregar todos os canais, vá para a página de inscrições:"
+    },
+    "settings": {
+        "message": "Configurações"
+    },
+    "show_channels": {
+        "message": "Mostrar Canais"
+    },
+    "hide_channels": {
+        "message": "Ocultar Canais"
+    },
+    "show_folders": {
+        "message": "Mostrar Pastas"
+    },
+    "hide_folders": {
+        "message": "Ocultar Pastas"
+    },
+    "mode_modal": {
+        "message": "Modo Modal"
+    },
+    "mode_sidebar": {
+        "message": "Modo Sidebar"
+    },
+    "sidebar_left": {
+        "message": "Sidebar Esquerda"
+    },
+    "sidebar_right": {
+        "message": "Sidebar Direita"
+    },
+    "export_btn": {
+        "message": "Exportar"
+    },
+    "export_csv": {
+        "message": "Exportar CSV"
+    },
+    "export_json": {
+        "message": "Exportar JSON"
+    },
+    "export_md": {
+        "message": "Exportar MD"
+    },
+    "backup_folders": {
+        "message": "Backup Pastas"
+    },
+    "restore_folders": {
+        "message": "Restaurar Pastas"
+    },
+    "new_folder": {
+        "message": "Nova Pasta"
+    },
+    "folder_empty": {
+        "message": "Pasta vazia"
+    },
+    "delete_folder": {
+        "message": "Excluir Pasta"
+    },
+    "my_folders": {
+        "message": "Minhas Pastas"
+    },
+    "no_folders": {
+        "message": "Nenhuma pasta criada"
+    },
+    "folder_name_prompt": {
+        "message": "Nome da nova pasta:"
+    },
+    "selected_title": {
+        "message": "Selecionados ({count})"
+    },
+    "no_selection": {
+        "message": "Nenhum canal selecionado"
+    },
+    "remove_selection": {
+        "message": "Remover da seleção"
+    },
+    "clear_selection": {
+        "message": "Limpar Seleção"
+    },
+    "unsubscribe_btn": {
+        "message": "Cancelar ({count})"
+    },
+    "toast_loaded": {
+        "message": "{count} canais carregados"
+    },
+    "toast_go_to_feed": {
+        "message": "Vá para youtube.com/feed/channels primeiro!"
+    },
+    "toast_backup_success": {
+        "message": "Backup de {count} pastas criado!"
+    },
+    "toast_restore_success": {
+        "message": "{count} pastas restauradas!"
+    },
+    "toast_export_success": {
+        "message": "Exportado como {format}!"
+    },
+    "toast_folder_deleted": {
+        "message": "Pasta excluída"
+    },
+    "toast_no_channels": {
+        "message": "Nenhum canal para exportar!"
+    },
+    "confirm_unsubscribe": {
+        "message": "Tem certeza que deseja cancelar {count} inscrição(ões)?\n\nIsso não pode ser desfeito!"
+    },
+    "confirm_delete_folder": {
+        "message": "Excluir esta pasta?"
+    },
+    "progress_unsubscribing": {
+        "message": "Cancelando Inscrições..."
+    },
+    "progress_starting": {
+        "message": "Iniciando..."
+    },
+    "progress_stopping": {
+        "message": "Parando..."
+    },
+    "progress_stop_btn": {
+        "message": "PARAR"
+    },
+    "progress_rate_limit": {
+        "message": "⚠️ Possível Rate Limit Detectado"
+    },
+    "progress_rate_limit_desc": {
+        "message": "O YouTube pode estar bloqueando suas ações. Aguarde 5-10 minutos."
+    },
+    "progress_stats": {
+        "message": "✅ Sucesso: {success}<br>❌ Falhas: {failed}"
+    },
+    "empty_channels": {
+        "message": "Nenhum canal encontrado. Clique em \"Carregar Todos\" para buscar."
+    },
+    "channels_hidden": {
+        "message": "Canais ocultos"
+    }
+}

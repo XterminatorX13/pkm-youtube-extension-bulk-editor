@@ -124,10 +124,11 @@
             })
         })
 
-        // Toggle dropdown
+        // Toggle dropdown (Settings)
         document.querySelector("[data-toggle-dropdown]")?.addEventListener("click", (e) => {
             e.stopPropagation()
             state.dropdownOpen = !state.dropdownOpen
+            if (state.dropdownOpen) state.exportDropdownOpen = false // Close export if opening settings
             updateUI()
         })
 
@@ -135,14 +136,14 @@
         document.querySelector("[data-toggle-channels]")?.addEventListener("click", () => {
             state.showChannels = !state.showChannels
             saveVisibility()
-            state.dropdownOpen = false
+            // state.dropdownOpen = false // Optional: keep open for multiple toggles
             updateUI()
         })
 
         document.querySelector("[data-toggle-folders]")?.addEventListener("click", () => {
             state.showFolders = !state.showFolders
             saveVisibility()
-            state.dropdownOpen = false
+            // state.dropdownOpen = false
             updateUI()
         })
 
@@ -218,7 +219,7 @@
         document.querySelector("[data-toggle-export-dropdown]")?.addEventListener("click", (e) => {
             e.stopPropagation()
             state.exportDropdownOpen = !state.exportDropdownOpen
-            state.dropdownOpen = false  // Close other dropdown
+            if (state.exportDropdownOpen) state.dropdownOpen = false  // Close settings if opening export
             updateUI()
         })
 

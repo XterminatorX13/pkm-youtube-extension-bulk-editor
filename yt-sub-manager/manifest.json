@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "YT Bulk Manager",
   "version": "1.0.0",
+  "default_locale": "en",
   "description": "Gerencie e cancele inscrições do YouTube em massa - sem OAuth necessário",
   "permissions": [
     "activeTab",
@@ -24,6 +25,7 @@
       ],
       "js": [
         "1-main.js",
+        "8-i18n.js",
         "2-dom.js",
         "3-folders.js",
         "4-export.js",

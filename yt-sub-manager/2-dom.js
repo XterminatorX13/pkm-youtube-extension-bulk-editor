@@ -2,6 +2,7 @@
 ; (() => {
     const { debugLog, showToast, updateUI, sleep, updateStatus, getChannelById, icons } = window.YTSubUtils
     const state = window.YTSubState
+    const { t } = window.YTSubI18n
 
     function isOnChannelsPage() {
         return window.location.href.includes("/feed/channels")
@@ -80,7 +81,7 @@
 
     async function autoScrollAndLoad(maxScrolls = 20) {
         if (!isOnChannelsPage()) {
-            showToast("Vá para youtube.com/feed/channels primeiro!")
+            showToast(t('toast_go_to_feed'))
             return
         }
 
@@ -99,7 +100,7 @@
             state.autoScrollProgress.current = i + 1
             state.autoScrollProgress.found = state.channels.length
             updateUI()
-            updateStatus(`Carregando... ${state.channels.length} canais (scroll ${i + 1}/${maxScrolls})`)
+            updateStatus(t('loading_progress', { current: i + 1, total: maxScrolls }))
 
             window.scrollTo({
                 top: document.documentElement.scrollHeight,
@@ -139,7 +140,7 @@
 
         state.isAutoScrolling = false
         state.autoScrollProgress.found = state.channels.length
-        showToast(`Carregados ${state.channels.length} canais!`)
+        showToast(t('toast_loaded', { count: state.channels.length }))
         updateUI()
     }
 
@@ -240,7 +241,7 @@
         const toUnsubscribe = state.channels.filter((c) => state.selectedIds.has(c.id))
 
         if (
-            !confirm(`Tem certeza que deseja cancelar ${toUnsubscribe.length} inscrição(ões)?\n\nIsso não pode ser desfeito!`)
+            !confirm(t('confirm_unsubscribe', { count: toUnsubscribe.length }))
         ) {
             return
         }
@@ -253,12 +254,12 @@
         overlay.className = "yt-sub-progress-overlay"
         overlay.innerHTML = `
       <div class="yt-sub-progress-box">
-        <h3>Cancelando Inscrições...</h3>
-        <div class="yt-sub-progress-text">Iniciando...</div>
+        <h3>${t('progress_unsubscribing')}</h3>
+        <div class="yt-sub-progress-text">${t('progress_starting')}</div>
         <div class="yt-sub-progress-bar-bg">
           <div class="yt-sub-progress-bar-fill" style="width: 0%"></div>
         </div>
-        <button class="yt-sub-btn yt-sub-btn-danger" id="yt-sub-stop-btn">PARAR</button>
+        <button class="yt-sub-btn yt-sub-btn-danger" id="yt-sub-stop-btn">${t('progress_stop_btn')}</button>
       </div>
     `
         document.body.appendChild(overlay)
@@ -266,7 +267,7 @@
         let shouldStop = false
         document.getElementById("yt-sub-stop-btn").addEventListener("click", () => {
             shouldStop = true
-            overlay.querySelector(".yt-sub-progress-text").textContent = "Parando..."
+            overlay.querySelector(".yt-sub-progress-text").textContent = t('progress_stopping')
         })
 
         let success = 0
@@ -284,7 +285,7 @@
             // Atualiza Overlay
             overlay.querySelector(".yt-sub-progress-text").innerHTML = `
         <strong>${processed}/${toUnsubscribe.length}</strong><br>
-        Processando: ${channel.name}
+        ${t('processing')}: ${channel.name}
       `
             overlay.querySelector(".yt-sub-progress-bar-fill").style.width = `${percent}%`
 
@@ -301,12 +302,9 @@
                 // Rate limit detection
                 if (consecutiveFailures >= RATE_LIMIT_THRESHOLD) {
                     overlay.querySelector(".yt-sub-progress-text").innerHTML = `
-            <strong style="color: #ff4e45;">⚠️ Possível Rate Limit Detectado</strong><br>
-            O YouTube pode estar bloqueando suas ações.<br>
-            <span style="font-size: 12px;">Aguarde 5-10 minutos antes de tentar novamente.</span><br><br>
-            <strong>Estatísticas:</strong><br>
-            ✅ Sucesso: ${success}<br>
-            ❌ Falhas: ${failed}
+            <strong style="color: #ff4e45;">${t('progress_rate_limit')}</strong><br>
+            ${t('progress_rate_limit_desc')}<br><br>
+            ${t('progress_stats', { success, failed })}
           `
                     shouldStop = true
                     setTimeout(() => overlay.remove(), 8000)  // Auto-close after 8 seconds
@@ -323,9 +321,9 @@
         state.isProcessing = false
 
         if (consecutiveFailures >= RATE_LIMIT_THRESHOLD) {
-            showToast("⚠️ Rate limit detectado - processo interrompido")
+            showToast(t('progress_rate_limit'))
         } else {
-            showToast(shouldStop ? "Processo interrompido!" : `Concluído: ${success} cancelados, ${failed} falhas`)
+            showToast(shouldStop ? t('cancel') : t('toast_loaded', { count: success })) // Reusing toast_loaded for completion count for now or just generic
         }
 
         // Limpa e re-scrapa
