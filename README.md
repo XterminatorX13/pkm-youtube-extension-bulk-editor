@@ -53,7 +53,7 @@ Como ainda não está na loja (veja abaixo como publicar!), instale assim:
 2.  Acesse `chrome://extensions` (Chrome/Brave/Edge) ou `about:debugging` (Firefox).
 3.  Ative o **Modo do Desenvolvedor**.
 4.  Clique em **Carregar sem compactação** (Load Unpacked).
-5.  Selecione a pasta do projeto.
+5.  Selecione a pasta **`yt-sub-manager`** dentro do projeto.
 6.  Acesse [youtube.com/feed/channels](https://www.youtube.com/feed/channels) e divirta-se!
 
 ---

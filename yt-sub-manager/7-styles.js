@@ -1,34 +1,34 @@
-// 7-styles.js - CSS injection + Icons (~500 lines)
-(() => {
-    const icons = {
-        youtube: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>`,
-        close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>`,
-        check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`,
-        folder: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`,
-        trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>`,
-        refresh: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 22v-6h6M21 13a9 9 0 1 1-3-7.7M3 11a9 9 0 0 1 3 7.7"/></svg>`,
-        grid: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`,
-        chevronDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`,
-        chevronRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`,
-        plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
-        minus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
-        eye: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
-        eyeOff: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
-        settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`,
-        list: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
-        download: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
-        loader: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>`,
-        externalLink: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`,
-        expand: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`,
-    };
+// 7-styles.js - CSS injection, Floating Action Button, and Initialization
+; (() => {
+  const { debugLog, showToast, updateUI, icons } = window.YTSubUtils
+  const state = window.YTSubState
+  const { scrapeChannels, isOnChannelsPage } = window.YTSubDom || {}
 
-    function inject() {
-        if (document.querySelector("#yt-sub-styles")) return;
+  function createFAB() {
+    if (document.querySelector("#yt-sub-fab")) return
 
-        const style = document.createElement("style");
-        style.id = "yt-sub-styles";
-        style.textContent = `
-      /* FAB */
+    const fab = document.createElement("button")
+    fab.id = "yt-sub-fab"
+    fab.innerHTML = icons.grid
+    fab.title = "Gerenciar Inscrições"
+
+    fab.addEventListener("click", () => {
+      state.panelOpen = !state.panelOpen
+      if (state.panelOpen && state.channels.length === 0) {
+        if (scrapeChannels) scrapeChannels()
+      }
+      updateUI()
+    })
+
+    document.body.appendChild(fab)
+  }
+
+  function injectStyles() {
+    if (document.querySelector("#yt-sub-styles")) return
+
+    const style = document.createElement("style")
+    style.id = "yt-sub-styles"
+    style.textContent = `
       #yt-sub-fab {
         position: fixed;
         bottom: 24px;
@@ -50,7 +50,6 @@
       #yt-sub-fab:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
       #yt-sub-fab svg { width: 22px; height: 22px; }
 
-      /* Panel */
       #yt-sub-panel {
         position: fixed;
         z-index: 10000;
@@ -61,7 +60,7 @@
       }
       #yt-sub-panel.open { opacity: 1; visibility: visible; }
 
-      /* Sidebar - Right */
+      /* Sidebar mode - Right */
       #yt-sub-panel.yt-sub-panel-sidebar.yt-sub-position-right {
         top: 0;
         right: 0;
@@ -74,7 +73,7 @@
         border-left: 1px solid #272727;
       }
 
-      /* Sidebar - Left */
+      /* Sidebar mode - Left */
       #yt-sub-panel.yt-sub-panel-sidebar.yt-sub-position-left {
         top: 0;
         left: 0;
@@ -87,7 +86,7 @@
         border-right: 1px solid #272727;
       }
 
-      /* Modal */
+      /* Modal mode - Centered */
       #yt-sub-panel.yt-sub-panel-modal {
         top: 0;
         left: 0;
@@ -107,6 +106,14 @@
         border: 1px solid #272727;
         box-shadow: 0 8px 32px rgba(0,0,0,0.6);
       }
+      
+      /* Compact mode quando canais estão ocultos */
+      .yt-sub-sidebar.compact {
+        max-height: 400px;
+      }
+      #yt-sub-panel.yt-sub-panel-modal .yt-sub-sidebar.compact {
+        height: auto;
+      }
 
       .yt-sub-sidebar {
         background: #0f0f0f;
@@ -115,142 +122,82 @@
         overflow: hidden;
       }
 
-      /* Toast */
-      .yt-sub-toast {
-        position: fixed;
-        bottom: 90px;
-        right: 30px;
-        background: #323232;
-        color: #f1f1f1;
-        padding: 12px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        z-index: 10001;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.3s;
-        pointer-events: none;
+      /* Warning box */
+      .yt-sub-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #3d2c00 0%, #2d2000 100%);
+        border-bottom: 1px solid #5c4600;
       }
-      .yt-sub-toast.show {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      /* Progress Overlay */
-      .yt-sub-progress-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.9);
+      .yt-sub-warning-icon {
+        width: 24px;
+        height: 24px;
+        background: #f59e0b;
+        color: #000;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 10002;
-      }
-      .yt-sub-progress-box {
-        background: #212121;
-        padding: 24px;
-        border-radius: 12px;
-        min-width: 300px;
-        text-align: center;
-      }
-      .yt-sub-progress-box h3 {
-        color: #f1f1f1;
-        margin: 0 0 16px 0;
-      }
-      .yt-sub-progress-text {
-        color: #aaa;
-        margin: 12px 0;
+        font-weight: bold;
         font-size: 14px;
+        flex-shrink: 0;
       }
-      .yt-sub-progress-bar-bg {
-        background: #3f3f3f;
-        height: 8px;
-        border-radius: 4px;
-        overflow: hidden;
-        margin: 16px 0;
+      .yt-sub-warning-text {
+        flex: 1;
       }
-      .yt-sub-progress-bar-fill {
-        background: #3ea6ff;
-        height: 100%;
-        transition: width 0.3s;
+      .yt-sub-warning-text p {
+        color: #fbbf24;
+        font-size: 12px;
+        margin: 0 0 8px 0;
       }
-
-      /* Buttons */
-      .yt-sub-btn {
+      .yt-sub-warning-link {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 8px 12px;
-        border-radius: 18px;
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
-        border: none;
-        background: #272727;
-        color: #f1f1f1;
-        transition: background 0.2s, transform 0.1s;
-      }
-      .yt-sub-btn:hover { background: #3f3f3f; transform: translateY(-1px); }
-      .yt-sub-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-      .yt-sub-btn svg { width: 14px; height: 14px; }
-
-      .yt-sub-btn-xs { padding: 5px 10px; font-size: 12px; }
-      .yt-sub-btn-xs svg { width: 12px; height: 12px; }
-
-      .yt-sub-btn-sm { padding: 6px 12px; font-size: 12px; }
-
-      .yt-sub-btn-danger {
-        background: #c70000;
-        color: white;
-      }
-      .yt-sub-btn-danger:hover { background: #a00000; }
-
-      .yt-sub-btn-folder {
-        background: #3f3f3f;
         color: #3ea6ff;
+        font-size: 13px;
+        text-decoration: none;
+        padding: 6px 12px;
+        background: rgba(62,166,255,0.1);
+        border-radius: 16px;
+        transition: background 0.2s;
       }
-      .yt-sub-btn-folder:hover { background: #065fd4; color: white; }
+      .yt-sub-warning-link:hover {
+        background: rgba(62,166,255,0.2);
+      }
+      .yt-sub-warning-link svg {
+        width: 14px;
+        height: 14px;
+      }
 
-      /* Dropdown */
-      .yt-sub-dropdown {
-        position: relative;
+      /* Header */
+      .yt-sub-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: #0f0f0f;
+        border-bottom: 1px solid #272727;
       }
-      .yt-sub-dropdown-menu {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: #212121;
-        border: 1px solid #3f3f3f;
-        border-radius: 8px;
-        padding: 4px 0;
-        min-width: 180px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        z-index: 100;
-        margin-top: 4px;
+      .yt-sub-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
       }
-      .yt-sub-dropdown-item {
+      .yt-sub-title {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 10px 14px;
         color: #f1f1f1;
-        font-size: 13px;
-        cursor: pointer;
-        border: none;
-        background: none;
-        width: 100%;
-        text-align: left;
-        transition: background 0.2s;
+        font-size: 16px;
+        font-weight: 500;
       }
-      .yt-sub-dropdown-item:hover { background: #3f3f3f; }
-      .yt-sub-dropdown-item svg { width: 16px; height: 16px; }
+      .yt-sub-icon { color: #ff0000; display: flex; }
+      .yt-sub-icon svg { width: 20px; height: 20px; }
 
-      .yt-sub-dropdown-divider {
-        height: 1px;
-        background: #3f3f3f;
-        margin: 4px 0;
-      }
-
+      /* Buttons */
       .yt-sub-btn-icon {
         background: none;
         border: none;
@@ -267,6 +214,7 @@
       .yt-sub-btn-icon:disabled { opacity: 0.5; cursor: not-allowed; }
       .yt-sub-btn-icon svg { width: 18px; height: 18px; }
 
+      /* Animação de spinning para o loader */
       .yt-sub-btn-icon.yt-sub-spinning svg {
         animation: yt-sub-spin 1s linear infinite;
       }
@@ -275,12 +223,637 @@
         to { transform: rotate(360deg); }
       }
 
-      /* More CSS would go here... */
-    `;
+      .yt-sub-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 18px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        background: #272727;
+        color: #f1f1f1;
+        transition: background 0.2s, transform 0.1s;
+      }
+      .yt-sub-btn:hover { background: #3f3f3f; transform: translateY(-1px); }
+      .yt-sub-btn:active { transform: translateY(0); }
+      .yt-sub-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+      .yt-sub-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+      
+      .yt-sub-btn-xs {
+        padding: 5px 10px;
+        font-size: 12px;
+        gap: 4px;
+      }
+      .yt-sub-btn-xs svg { width: 12px; height: 12px; }
 
-        document.head.appendChild(style);
+      .yt-sub-btn-sm { padding: 6px 12px; font-size: 12px; }
+      .yt-sub-btn-sm svg { width: 13px; height: 13px; }
+
+      /* Botão de carregar todos */
+      .yt-sub-btn-load {
+        background: #1a472a;
+        color: #4ade80;
+      }
+      .yt-sub-btn-load:hover:not(:disabled) {
+        background: #22633b;
+      }
+      .yt-sub-btn-load.loading {
+        background: #1a472a;
+      }
+      .yt-sub-btn-load.loading svg {
+        animation: yt-sub-spin 1s linear infinite;
+      }
+
+      /* Botão pílula para pastas */
+      .yt-sub-btn-pill {
+        border-radius: 20px;
+        padding: 6px 12px;
+        background: #263850;
+        color: #3ea6ff;
+      }
+      .yt-sub-btn-pill:hover:not(:disabled) { background: #2d4a6a; }
+      .yt-sub-badge-inline {
+        background: rgba(62,166,255,0.2);
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 11px;
+        margin-left: 2px;
+      }
+
+      .yt-sub-btn-folder { background: #263850; color: #3ea6ff; }
+      .yt-sub-btn-folder:hover:not(:disabled) { background: #2d4a6a; }
+      .yt-sub-btn-danger { background: #3d1519; color: #ff4e45; }
+      .yt-sub-btn-danger:hover:not(:disabled) { background: #5c1f24; }
+
+      /* Actions Bar */
+      .yt-sub-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-bottom: 1px solid #272727;
+        flex-wrap: wrap;
+      }
+      .yt-sub-count {
+        color: #aaa;
+        font-size: 12px;
+        margin-left: auto;
+        background: #272727;
+        padding: 4px 8px;
+        border-radius: 10px;
+      }
+
+      /* Dropdown de opções */
+      .yt-sub-dropdown {
+        position: relative;
+      }
+      .yt-sub-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: #212121;
+        border: 1px solid #3f3f3f;
+        border-radius: 8px;
+        padding: 4px 0;
+        min-width: 200px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        z-index: 2000;
+        margin-top: 4px;
+      }
+      .yt-sub-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        color: #f1f1f1;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background 0.2s;
+        background: transparent;
+        border: none;
+        width: 100%;
+        text-align: left;
+        font-family: inherit;
+        box-sizing: border-box;
+      }
+      .yt-sub-dropdown-item:hover { background: #3f3f3f; }
+      .yt-sub-dropdown-item svg { width: 16px; height: 16px; color: #aaa; flex-shrink: 0; }
+      .yt-sub-dropdown-divider {
+        height: 1px;
+        background: #3f3f3f;
+        margin: 4px 0;
+      }
+
+      /* Search */
+      .yt-sub-search-wrap { padding: 8px 16px; }
+      .yt-sub-search {
+        width: 100%;
+        background: #121212;
+        border: 1px solid #272727;
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: #f1f1f1;
+        font-size: 13px;
+        outline: none;
+        box-sizing: border-box;
+      }
+      .yt-sub-search:focus { border-color: #3ea6ff; }
+      .yt-sub-search::placeholder { color: #717171; }
+
+      /* Status */
+      .yt-sub-status {
+        padding: 8px 16px;
+        background: #1a365d;
+        color: #63b3ed;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      /* Content */
+      .yt-sub-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 0;
+      }
+      .yt-sub-section { padding: 0 8px; margin-bottom: 8px; }
+      .yt-sub-section-title {
+        color: #aaa;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        padding: 8px;
+        letter-spacing: 0.5px;
+      }
+      
+      /* Mensagem quando canais estão ocultos */
+      .yt-sub-channels-hidden {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 16px;
+        color: #717171;
+        text-align: center;
+        gap: 12px;
+      }
+      .yt-sub-channels-hidden svg {
+        width: 24px;
+        height: 24px;
+        margin-bottom: 4px;
+      }
+
+      /* Folders - removido sticky para evitar bug de sobreposição */
+      .yt-sub-folders-section {
+        background: #0f0f0f;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #272727;
+        margin-bottom: 8px;
+      }
+      .yt-sub-folder { margin-bottom: 2px; border-radius: 8px; overflow: hidden; }
+      .yt-sub-folder-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background 0.2s;
+      }
+      .yt-sub-folder-header:hover { background: #272727; }
+      .yt-sub-folder-chevron { color: #717171; display: flex; }
+      .yt-sub-folder-chevron svg { width: 16px; height: 16px; }
+      .yt-sub-folder-icon { color: #3ea6ff; display: flex; }
+      .yt-sub-folder-icon svg { width: 18px; height: 18px; }
+      .yt-sub-folder-name { flex: 1; color: #f1f1f1; font-size: 14px; }
+      .yt-sub-folder-badge {
+        background: #272727;
+        color: #aaa;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+      }
+      .yt-sub-folder-delete {
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .yt-sub-folder-header:hover .yt-sub-folder-delete { opacity: 1; }
+      .yt-sub-folder-content {
+        padding: 4px 0 4px 24px;
+        background: #181818;
+        border-radius: 0 0 8px 8px;
+      }
+      .yt-sub-folder-empty {
+        color: #717171;
+        font-size: 12px;
+        padding: 8px 12px;
+      }
+
+      /* Channel items */
+      .yt-sub-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 8px;
+        margin: 2px 8px;
+        transition: background 0.15s;
+      }
+      .yt-sub-item:hover { background: #272727; }
+      .yt-sub-item.selected { background: #1a3a5c; }
+      .yt-sub-item-sm { padding: 6px 10px; margin: 1px 4px; }
+
+      .yt-sub-checkbox {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #717171;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        flex-shrink: 0;
+      }
+      .yt-sub-checkbox svg { width: 12px; height: 12px; opacity: 0; }
+      .yt-sub-checkbox.checked {
+        background: #3ea6ff;
+        border-color: #3ea6ff;
+      }
+      .yt-sub-checkbox.checked svg { opacity: 1; color: #000; }
+
+      .yt-sub-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+      .yt-sub-item-sm .yt-sub-avatar { width: 28px; height: 28px; }
+
+      .yt-sub-info { flex: 1; min-width: 0; }
+      .yt-sub-name {
+        color: #f1f1f1;
+        font-size: 14px;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .yt-sub-item-sm .yt-sub-name { font-size: 13px; }
+      .yt-sub-subs {
+        color: #aaa;
+        font-size: 11px;
+      }
+
+      .yt-sub-empty {
+        color: #717171;
+        font-size: 13px;
+        padding: 24px 16px;
+        text-align: center;
+      }
+
+      /* Footer */
+      .yt-sub-footer {
+        display: flex;
+        gap: 8px;
+        padding: 12px 16px;
+        border-top: 1px solid #272727;
+        background: #0f0f0f;
+      }
+      .yt-sub-footer .yt-sub-btn { flex: 1; justify-content: center; }
+
+      /* Toast */
+      .yt-sub-toast {
+        position: fixed;
+        bottom: 80px;
+        right: 24px;
+        background: #323232;
+        color: #f1f1f1;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 10001;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s;
+        pointer-events: none;
+      }
+      .yt-sub-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Folders modal */
+      .yt-sub-folders-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10002;
+        padding: 20px;
+      }
+      .yt-sub-folders-modal-content {
+        background: #212121;
+        border-radius: 12px;
+        width: 400px;
+        max-width: 100%;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .yt-sub-folders-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        border-bottom: 1px solid #3f3f3f;
+      }
+      .yt-sub-folders-modal-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #f1f1f1;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .yt-sub-folders-modal-title svg {
+        width: 20px;
+        height: 20px;
+        color: #3ea6ff;
+      }
+      .yt-sub-folders-modal-list {
+        padding: 12px;
+        overflow-y: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .yt-sub-folder-card {
+        background: #181818;
+        border-radius: 8px;
+        padding: 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .yt-sub-folder-card:hover { background: #272727; }
+      .yt-sub-folder-card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .yt-sub-folder-card-name {
+        flex: 1;
+        color: #f1f1f1;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .yt-sub-folder-card-preview {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .yt-sub-folder-card-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-left: -8px;
+        border: 2px solid #181818;
+      }
+      .yt-sub-folder-card-avatar:first-child { margin-left: 0; }
+      .yt-sub-folder-more {
+        color: #aaa;
+        font-size: 11px;
+        margin-left: 4px;
+      }
+      .yt-sub-folder-empty-text {
+        color: #717171;
+        font-size: 12px;
+      }
+      .yt-sub-badge {
+        background: #3f3f3f;
+        color: #aaa;
+        padding: 2px 6px;
+        border-radius: 8px;
+        font-size: 10px;
+      }
+
+      /* Folder preview modal */
+      .yt-sub-folder-preview-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10003;
+        padding: 20px;
+      }
+      .yt-sub-folder-preview-content {
+        background: #212121;
+        border-radius: 12px;
+        width: 320px;
+        max-width: 100%;
+        max-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .yt-sub-folder-preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid #3f3f3f;
+      }
+      .yt-sub-folder-preview-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #f1f1f1;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .yt-sub-folder-preview-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px;
+      }
+      .yt-sub-mini-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .yt-sub-mini-item:hover { background: #272727; }
+      .yt-sub-mini-item.selected { background: #1a3a5c; }
+      .yt-sub-checkbox-mini {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #717171;
+        border-radius: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .yt-sub-checkbox-mini svg { width: 10px; height: 10px; opacity: 0; }
+      .yt-sub-checkbox-mini.checked {
+        background: #3ea6ff;
+        border-color: #3ea6ff;
+      }
+      .yt-sub-checkbox-mini.checked svg { opacity: 1; color: #000; }
+      .yt-sub-avatar-mini {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .yt-sub-name-mini {
+        color: #f1f1f1;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .yt-sub-folder-preview-footer {
+        padding: 12px;
+        border-top: 1px solid #3f3f3f;
+        display: flex;
+        justify-content: center;
+      }
+      .yt-sub-empty-mini {
+        color: #717171;
+        font-size: 13px;
+        padding: 24px;
+        text-align: center;
+      }
+
+      /* Progress Overlay */
+      .yt-sub-progress-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.9);
+        z-index: 10005;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(5px);
+      }
+      .yt-sub-progress-box {
+        background: #212121;
+        padding: 30px;
+        border-radius: 12px;
+        width: 400px;
+        text-align: center;
+        border: 1px solid #3f3f3f;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      }
+      .yt-sub-progress-box h3 { margin: 0 0 15px 0; color: #fff; }
+      .yt-sub-progress-text { margin-bottom: 20px; color: #aaa; line-height: 1.5; }
+      .yt-sub-progress-bar-bg {
+        background: #3f3f3f;
+        height: 10px;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+      .yt-sub-progress-bar-fill {
+        background: #ff4e45;
+        height: 100%;
+        transition: width 0.3s;
+      }
+
+      /* Interactive Counter */
+      .yt-sub-count {
+        background: none;
+        border: none;
+        color: #aaa;
+        font-size: 12px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 12px;
+        transition: background 0.2s, color 0.2s;
+      }
+      .yt-sub-count:hover {
+        background: #3f3f3f;
+        color: #fff;
+      }
+
+      .yt-sub-remove-selection {
+        opacity: 0.6;
+        transition: opacity 0.2s;
+      }
+      .yt-sub-remove-selection:hover {
+        opacity: 1;
+        color: #ff4e45;
+      }
+    `
+    document.head.appendChild(style)
+  }
+
+  // Inicialização
+  function init() {
+    console.log("[v0] Inicializando extensão...")
+    injectStyles()
+    createFAB()
+
+    // Scrape inicial se estiver na página certa
+    if (isOnChannelsPage && isOnChannelsPage()) {
+      setTimeout(() => {
+        if (scrapeChannels) {
+          scrapeChannels()
+          console.log("[v0] Canais iniciais:", state.channels.length)
+        }
+      }, 1500)
     }
+  }
 
-    window.YTSub.icons = icons;
-    window.YTSub.styles = { inject };
-})();
+  // Aguarda DOM carregar
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init)
+  } else {
+    init()
+  }
+
+  // Observer para detectar navegação SPA do YouTube
+  let lastUrl = location.href
+  new MutationObserver(() => {
+    const url = location.href
+    if (url !== lastUrl) {
+      lastUrl = url
+      console.log("[v0] URL mudou:", url)
+      // Reset channels quando muda de página
+      if (!url.includes("/feed/channels")) {
+        state.channels = []
+      } else {
+        setTimeout(() => {
+          if (scrapeChannels) scrapeChannels()
+        }, 1500)
+      }
+      if (state.panelOpen) updateUI()
+    }
+  }).observe(document, { subtree: true, childList: true })
+})()

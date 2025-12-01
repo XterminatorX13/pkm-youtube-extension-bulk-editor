@@ -1,173 +1,194 @@
-// 2-dom.js - DOM scraping & unsubscribe logic (~420 lines)
-(() => {
-    const { state, debugLog, safeSetLocalStorage, sleep, showToast, updateUI } = window.YTSub;
+// 2-dom.js - DOM manipulation, scraping, and bulk actions
+; (() => {
+    const { debugLog, showToast, updateUI, sleep, updateStatus, getChannelById, icons } = window.YTSubUtils
+    const state = window.YTSubState
 
     function isOnChannelsPage() {
-        return location.href.includes("/feed/channels");
+        return window.location.href.includes("/feed/channels")
     }
 
+    // Security: URL validation to prevent open redirect
     function isValidYouTubeURL(url) {
-        if (!url) return false;
+        if (!url) return false
         try {
-            const parsed = new URL(url);
-            return ["youtube.com", "youtu.be"].some(h =>
-                parsed.hostname === h || parsed.hostname.endsWith(`.${h}`)
-            );
+            const parsed = new URL(url)
+            return parsed.hostname.endsWith('youtube.com') ||
+                parsed.hostname.endsWith('youtu.be') ||
+                parsed.hostname === 'youtube.com' ||
+                parsed.hostname === 'youtu.be'
         } catch {
-            return false;
+            return false
         }
     }
 
     function scrapeChannels() {
-        debugLog("Scraping canais...");
-        const { channels } = state;
-        const existingNames = new Set(channels.map(c => c.name));
+        debugLog("Scraping canais...")
+        const existingNames = new Set(state.channels.map((c) => c.name))
+        const newChannels = [...state.channels] // Work with a copy to push
 
-        // Main channel renderers
-        const renderers = document.querySelectorAll("ytd-channel-renderer, ytd-grid-channel-renderer");
+        const channelRenderers = document.querySelectorAll("ytd-channel-renderer, ytd-grid-channel-renderer")
 
-        renderers.forEach((el, i) => {
-            const nameEl = el.querySelector("#channel-title, #text, yt-formatted-string#text");
-            const imgEl = el.querySelector("#avatar img, yt-img-shadow img");
-            const subsEl = el.querySelector("#subscribers, #subscriber-count");
-            const subscribeBtn = el.querySelector("ytd-subscribe-button-renderer, #subscribe-button");
+        channelRenderers.forEach((el, i) => {
+            const nameEl = el.querySelector("#channel-title, #text, yt-formatted-string#text")
+            const imgEl = el.querySelector("#avatar img, yt-img-shadow img")
+            const subsEl = el.querySelector("#subscribers, #subscriber-count")
+            const subscribeBtn = el.querySelector("ytd-subscribe-button-renderer, #subscribe-button")
 
             if (nameEl) {
-                const name = nameEl.innerText?.trim() || "Canal";
+                const name = nameEl.innerText?.trim() || "Canal"
                 if (!existingNames.has(name)) {
-                    existingNames.add(name);
-                    channels.push({
+                    existingNames.add(name)
+                    newChannels.push({
                         id: `ch-${Date.now()}-${i}`,
-                        name,
+                        name: name,
                         avatar: imgEl?.src || "",
                         subscribers: subsEl?.innerText?.trim() || "",
                         element: el,
-                        subscribeBtn,
-                    });
+                        subscribeBtn: subscribeBtn,
+                    })
                 }
             }
-        });
+        })
 
-        // Fallback sidebar
-        if (channels.length === 0) {
-            const sidebarItems = document.querySelectorAll("#sections ytd-guide-entry-renderer");
+        // Fallback para sidebar se não encontrar nada
+        if (newChannels.length === 0) {
+            const sidebarItems = document.querySelectorAll("#sections ytd-guide-entry-renderer")
             sidebarItems.forEach((el, i) => {
-                const link = el.querySelector("a");
-                const name = el.querySelector("yt-formatted-string")?.innerText?.trim();
-                const img = el.querySelector("img")?.src;
-                const href = link?.href;
+                const link = el.querySelector("a")
+                const name = el.querySelector("yt-formatted-string")?.innerText?.trim()
+                const img = el.querySelector("img")?.src
+                const href = link?.href
 
                 if (name && href && isValidYouTubeURL(href) && href.includes("/@") && !existingNames.has(name)) {
-                    existingNames.add(name);
-                    channels.push({
+                    existingNames.add(name)
+                    newChannels.push({
                         id: `sb-${i}`,
-                        name,
+                        name: name,
                         avatar: img || "",
                         subscribers: "",
                         element: el,
-                        href,
-                    });
+                        href: href,
+                    })
                 }
-            });
+            })
         }
 
-        debugLog("Total de canais:", channels.length);
-        return channels;
+        state.channels = newChannels // Update global state
+        debugLog("Total de canais:", state.channels.length)
+        return state.channels
     }
 
     async function autoScrollAndLoad(maxScrolls = 20) {
         if (!isOnChannelsPage()) {
-            showToast("Vá para youtube.com/feed/channels primeiro!");
-            return;
+            showToast("Vá para youtube.com/feed/channels primeiro!")
+            return
         }
 
-        const { state } = window.YTSub;
-        state.isAutoScrolling = true;
-        state.autoScrollProgress = { current: 0, total: maxScrolls, found: state.channels.length };
-        updateUI();
+        state.isAutoScrolling = true
+        state.autoScrollProgress = { current: 0, total: maxScrolls, found: state.channels.length }
+        updateUI()
 
-        let previousCount = state.channels.length;
-        let noNewChannels = 0;
+        let previousCount = state.channels.length
+        let noNewChannels = 0
+
+        // Encontrar o container de scroll do YouTube
+        const scrollContainer =
+            document.querySelector("ytd-page-manager") || document.querySelector("#page-manager") || document.documentElement
 
         for (let i = 0; i < maxScrolls; i++) {
-            state.autoScrollProgress.current = i + 1;
-            state.autoScrollProgress.found = state.channels.length;
-            updateUI();
+            state.autoScrollProgress.current = i + 1
+            state.autoScrollProgress.found = state.channels.length
+            updateUI()
+            updateStatus(`Carregando... ${state.channels.length} canais (scroll ${i + 1}/${maxScrolls})`)
 
-            window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: "smooth",
+            })
 
-            const ytContent = document.querySelector('ytd-browse[page-subtype="channels"]');
+            // Também tenta scrollar o conteúdo principal do YouTube
+            const ytContent = document.querySelector('ytd-browse[page-subtype="channels"]')
             if (ytContent) {
-                ytContent.scrollIntoView({ behavior: "smooth", block: "end" });
+                ytContent.scrollIntoView({ behavior: "smooth", block: "end" })
             }
 
-            await window.YTSub.sleep(1800);
-            scrapeChannels();
+            // Aguarda conteúdo carregar
+            await sleep(1800)
 
+            // Scrapa os novos canais
+            scrapeChannels()
+
+            // Verifica se encontrou novos
             if (state.channels.length === previousCount) {
-                noNewChannels++;
-                debugLog(`Nenhum canal novo na tentativa ${noNewChannels}`);
+                noNewChannels++
+                debugLog(`Nenhum canal novo na tentativa ${noNewChannels}`)
                 if (noNewChannels >= 3) {
-                    debugLog("Finalizando - sem novos canais");
-                    break;
+                    debugLog("Finalizando - sem novos canais")
+                    break
                 }
             } else {
-                noNewChannels = 0;
-                debugLog(`Encontrados ${state.channels.length - previousCount} novos canais`);
+                noNewChannels = 0
+                debugLog(`Encontrados ${state.channels.length - previousCount} novos canais`)
             }
 
-            previousCount = state.channels.length;
+            previousCount = state.channels.length
         }
 
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        state.isAutoScrolling = false;
-        state.autoScrollProgress.found = state.channels.length;
-        showToast(`Carregados ${state.channels.length} canais!`);
-        updateUI();
+        // Volta ao topo suavemente
+        window.scrollTo({ top: 0, behavior: "smooth" })
+
+        state.isAutoScrolling = false
+        state.autoScrollProgress.found = state.channels.length
+        showToast(`Carregados ${state.channels.length} canais!`)
+        updateUI()
     }
 
     async function unsubscribeChannel(channel) {
         return new Promise(async (resolve) => {
-            debugLog("Iniciando cancelamento para:", channel.name);
+            debugLog("Iniciando cancelamento para:", channel.name)
 
-            // Scroll to channel
+            // 1. Scroll suave para o canal (centralizado)
             if (channel.element) {
-                const rect = channel.element.getBoundingClientRect();
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                const targetY = rect.top + scrollTop - window.innerHeight / 2;
-                window.scrollTo({ top: targetY, behavior: "smooth" });
-                await window.YTSub.sleep(150);
+                const rect = channel.element.getBoundingClientRect()
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+                const targetY = rect.top + scrollTop - window.innerHeight / 2
+
+                window.scrollTo({
+                    top: targetY,
+                    behavior: "smooth",
+                })
+                await sleep(150)
             }
 
-            // Find subscribe button
+            // 2. Encontrar botão de inscrição
             const subscribeContainer = channel.element?.querySelector(
                 "#subscribe-button, ytd-subscribe-button-renderer, [class*='subscribe']"
-            );
+            )
 
             if (!subscribeContainer) {
-                debugLog("Container não encontrado");
-                resolve(false);
-                return;
+                debugLog("Container não encontrado")
+                resolve(false)
+                return
             }
 
             const subscribedBtn =
                 subscribeContainer.querySelector("button, yt-button-shape button, yt-smartimation button, [role='button']") ||
-                subscribeContainer;
+                subscribeContainer
 
             if (!subscribedBtn) {
-                debugLog("Botão não encontrado");
-                resolve(false);
-                return;
+                debugLog("Botão não encontrado")
+                resolve(false)
+                return
             }
 
-            // Click button
-            subscribedBtn.click();
-            await window.YTSub.sleep(150);
+            // 3. Clicar no botão para abrir menu/dialog
+            subscribedBtn.click()
+            await sleep(150)
 
-            // Wait for confirmation dialog
+            // 4. Lógica de Retry para encontrar o botão de confirmação
             await new Promise((resolveConfirm) => {
-                let attempts = 0;
-                const maxAttempts = 20;
+                let attempts = 0
+                const maxAttempts = 20 // 2 segundos max
 
                 const waitForConfirmationButton = () => {
                     const selectors = [
@@ -177,57 +198,59 @@
                         "#confirm-button button",
                         "yt-button-renderer#confirm-button button",
                         "[aria-label='Cancelar inscrição']"
-                    ];
+                    ]
 
-                    let confirmBtn = null;
+                    let confirmBtn = null
                     for (const selector of selectors) {
-                        confirmBtn = document.querySelector(selector);
-                        if (confirmBtn) break;
+                        confirmBtn = document.querySelector(selector)
+                        if (confirmBtn) break
                     }
 
                     if (confirmBtn) {
-                        confirmBtn.click();
-                        debugLog("Confirmado com sucesso!");
-                        resolveConfirm(true);
+                        confirmBtn.click()
+                        debugLog("Confirmado com sucesso!")
+                        resolveConfirm(true)
                     } else {
-                        attempts++;
+                        attempts++
                         if (attempts < maxAttempts) {
-                            setTimeout(waitForConfirmationButton, 100);
+                            setTimeout(waitForConfirmationButton, 100)
                         } else {
-                            debugLog("Timeout esperando confirmação");
-                            document.body.click();
-                            resolveConfirm(false);
+                            debugLog("Timeout esperando confirmação")
+                            // Tenta fechar menu se falhou
+                            document.body.click()
+                            resolveConfirm(false)
                         }
                     }
-                };
+                }
 
-                waitForConfirmationButton();
-            });
+                waitForConfirmationButton()
+            })
 
-            // Random delay to avoid rate limiting
-            const randomDelay = 250 + Math.random() * 250;
-            await window.YTSub.sleep(randomDelay);
+            // 5. Delay Randomizado (CRÍTICO para evitar rate limit)
+            const randomDelay = 250 + Math.random() * 250
+            await sleep(randomDelay)
 
-            resolve(true);
-        });
+            resolve(true)
+        })
     }
 
     async function bulkUnsubscribe() {
-        const { state } = window.YTSub;
-        if (state.selectedIds.size === 0 || state.isProcessing) return;
+        if (state.selectedIds.size === 0 || state.isProcessing) return
 
-        const toUnsubscribe = state.channels.filter(c => state.selectedIds.has(c.id));
+        const toUnsubscribe = state.channels.filter((c) => state.selectedIds.has(c.id))
 
-        if (!confirm(`Tem certeza que deseja cancelar ${toUnsubscribe.length} inscrição(ões)?\n\nIsso não pode ser desfeito!`)) {
-            return;
+        if (
+            !confirm(`Tem certeza que deseja cancelar ${toUnsubscribe.length} inscrição(ões)?\n\nIsso não pode ser desfeito!`)
+        ) {
+            return
         }
 
-        state.isProcessing = true;
-        updateUI();
+        state.isProcessing = true
+        updateUI()
 
-        // Create progress overlay
-        const overlay = document.createElement("div");
-        overlay.className = "yt-sub-progress-overlay";
+        // Criar Overlay de Progresso
+        const overlay = document.createElement("div")
+        overlay.className = "yt-sub-progress-overlay"
         overlay.innerHTML = `
       <div class="yt-sub-progress-box">
         <h3>Cancelando Inscrições...</h3>
@@ -237,43 +260,45 @@
         </div>
         <button class="yt-sub-btn yt-sub-btn-danger" id="yt-sub-stop-btn">PARAR</button>
       </div>
-    `;
-        document.body.appendChild(overlay);
+    `
+        document.body.appendChild(overlay)
 
-        let shouldStop = false;
+        let shouldStop = false
         document.getElementById("yt-sub-stop-btn").addEventListener("click", () => {
-            shouldStop = true;
-            overlay.querySelector(".yt-sub-progress-text").textContent = "Parando...";
-        });
+            shouldStop = true
+            overlay.querySelector(".yt-sub-progress-text").textContent = "Parando..."
+        })
 
-        let success = 0;
-        let failed = 0;
-        let processed = 0;
-        let consecutiveFailures = 0;
-        const RATE_LIMIT_THRESHOLD = 3;
+        let success = 0
+        let failed = 0
+        let processed = 0
+        let consecutiveFailures = 0
+        const RATE_LIMIT_THRESHOLD = 3
 
         for (const channel of toUnsubscribe) {
-            if (shouldStop) break;
+            if (shouldStop) break
 
-            processed++;
-            const percent = Math.round((processed / toUnsubscribe.length) * 100);
+            processed++
+            const percent = Math.round((processed / toUnsubscribe.length) * 100)
 
+            // Atualiza Overlay
             overlay.querySelector(".yt-sub-progress-text").innerHTML = `
         <strong>${processed}/${toUnsubscribe.length}</strong><br>
         Processando: ${channel.name}
-      `;
-            overlay.querySelector(".yt-sub-progress-bar-fill").style.width = `${percent}%`;
+      `
+            overlay.querySelector(".yt-sub-progress-bar-fill").style.width = `${percent}%`
 
-            const result = await unsubscribeChannel(channel);
+            const result = await unsubscribeChannel(channel)
 
             if (result) {
-                success++;
-                consecutiveFailures = 0;
-                state.selectedIds.delete(channel.id);
+                success++
+                consecutiveFailures = 0  // Reset on success
+                state.selectedIds.delete(channel.id)
             } else {
-                failed++;
-                consecutiveFailures++;
+                failed++
+                consecutiveFailures++
 
+                // Rate limit detection
                 if (consecutiveFailures >= RATE_LIMIT_THRESHOLD) {
                     overlay.querySelector(".yt-sub-progress-text").innerHTML = `
             <strong style="color: #ff4e45;">⚠️ Possível Rate Limit Detectado</strong><br>
@@ -282,34 +307,40 @@
             <strong>Estatísticas:</strong><br>
             ✅ Sucesso: ${success}<br>
             ❌ Falhas: ${failed}
-          `;
-                    shouldStop = true;
+          `
+                    shouldStop = true
+                    setTimeout(() => overlay.remove(), 8000)  // Auto-close after 8 seconds
+                    break
                 }
             }
-
-            await window.YTSub.sleep(500 + Math.random() * 500);
         }
 
-        // Final message
-        overlay.querySelector(".yt-sub-progress-text").innerHTML = `
-      <strong>Concluído!</strong><br>
-      ✅ Sucesso: ${success}<br>
-      ❌ Falhas: ${failed}<br><br>
-      <button class="yt-sub-btn" onclick="this.closest('.yt-sub-progress-overlay').remove()">Fechar</button>
-    `;
-        overlay.querySelector("#yt-sub-stop-btn").remove();
+        // Remover Overlay
+        if (!shouldStop || consecutiveFailures < RATE_LIMIT_THRESHOLD) {
+            overlay.remove()
+        }
 
-        state.isProcessing = false;
-        updateUI();
+        state.isProcessing = false
+
+        if (consecutiveFailures >= RATE_LIMIT_THRESHOLD) {
+            showToast("⚠️ Rate limit detectado - processo interrompido")
+        } else {
+            showToast(shouldStop ? "Processo interrompido!" : `Concluído: ${success} cancelados, ${failed} falhas`)
+        }
+
+        // Limpa e re-scrapa
+        state.channels = []
+        scrapeChannels()
+        updateUI()
     }
 
-    // Export public API
-    window.YTSub.dom = {
+    // Export to global
+    window.YTSubDom = {
+        isOnChannelsPage,
+        isValidYouTubeURL,
         scrapeChannels,
         autoScrollAndLoad,
         unsubscribeChannel,
-        bulkUnsubscribe,
-        isOnChannelsPage,
-        isValidYouTubeURL,
-    };
-})();
+        bulkUnsubscribe
+    }
+})()
