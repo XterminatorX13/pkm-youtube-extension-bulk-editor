@@ -193,7 +193,12 @@
                 } else {
                     state.selectedIds.add(id)
                 }
-                updateUI()
+                // Use lightweight update to avoid flickering
+                if (window.YTSubUI && window.YTSubUI.updateSelectionOnly) {
+                    window.YTSubUI.updateSelectionOnly()
+                } else {
+                    updateUI()
+                }
             })
         })
 
@@ -207,7 +212,12 @@
                 } else {
                     state.selectedIds.add(id)
                 }
-                updateUI()
+                // Use lightweight update to avoid flickering
+                if (window.YTSubUI && window.YTSubUI.updateSelectionOnly) {
+                    window.YTSubUI.updateSelectionOnly()
+                } else {
+                    updateUI()
+                }
             })
         })
 
