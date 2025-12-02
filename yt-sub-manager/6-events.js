@@ -7,13 +7,7 @@
     const { exportChannels, exportCSV } = window.YTSubExport || {}
 
     function attachEventListeners() {
-        // Attach dropdown-specific listeners (prevents flickering)
-        if (window.YTSubUI && window.YTSubUI.attachDropdownListeners) {
-            window.YTSubUI.attachDropdownListeners()
-        }
-
-        // Close button - managed by attachDropdownListeners but keeping here as fallback
-
+        // Close button
         document.querySelector("#yt-sub-close")?.addEventListener("click", () => {
             state.panelOpen = false
             updateUI()
@@ -50,6 +44,78 @@
             updateUI()
         })
 
+        // Toggle dropdown (Settings)
+        document.querySelector("[data-toggle-dropdown]")?.addEventListener("click", (e) => {
+            e.stopPropagation()
+            state.dropdownOpen = !state.dropdownOpen
+            if (state.dropdownOpen) state.exportDropdownOpen = false // Close export if opening settings
+            updateUI()
+        })
+
+        // Dropdown options
+        document.querySelector("[data-toggle-channels]")?.addEventListener("click", () => {
+            state.showChannels = !state.showChannels
+            saveVisibility()
+            updateUI()
+        })
+
+        document.querySelector("[data-toggle-folders]")?.addEventListener("click", () => {
+            state.showFolders = !state.showFolders
+            saveVisibility()
+            updateUI()
+        })
+
+        document.querySelector("[data-toggle-view]")?.addEventListener("click", () => {
+            state.viewMode = state.viewMode === "sidebar" ? "modal" : "sidebar"
+            safeSetLocalStorage("yt-view-mode", state.viewMode)
+            state.dropdownOpen = false
+            updateUI()
+        })
+
+        document.querySelector("[data-show-channels]")?.addEventListener("click", () => {
+            state.showChannels = true
+            saveVisibility()
+            updateUI()
+        })
+
+        // Sidebar position toggle
+        document.querySelector("[data-toggle-position]")?.addEventListener("click", () => {
+            state.sidebarPosition = state.sidebarPosition === "right" ? "left" : "right"
+            safeSetLocalStorage("yt-sidebar-position", state.sidebarPosition)
+            state.dropdownOpen = false
+            updateUI()
+        })
+
+        // Export dropdown toggle
+        document.querySelector("[data-toggle-export-dropdown]")?.addEventListener("click", (e) => {
+            e.stopPropagation()
+            state.exportDropdownOpen = !state.exportDropdownOpen
+            if (state.exportDropdownOpen) state.dropdownOpen = false  // Close settings if opening export
+            updateUI()
+        })
+
+        // Export actions
+        document.querySelectorAll("[data-export]").forEach(el => {
+            el.addEventListener("click", () => {
+                const format = el.getAttribute("data-export")
+                if (exportChannels) exportChannels(format)
+                state.exportDropdownOpen = false
+                updateUI()
+            })
+        })
+
+        // Backup/Restore from dropdown
+        document.querySelector("[data-backup-folders]")?.addEventListener("click", () => {
+            if (backupFolders) backupFolders()
+            state.exportDropdownOpen = false
+            updateUI()
+        })
+        document.querySelector("[data-restore-folders]")?.addEventListener("click", () => {
+            if (restoreFolders) restoreFolders()
+            state.exportDropdownOpen = false
+            updateUI()
+        })
+
         // Open folder preview from modal
         document.querySelectorAll("[data-open-folder-preview]").forEach((el) => {
             el.addEventListener("click", () => {
@@ -62,11 +128,6 @@
         document.querySelector("[data-close-folder-preview]")?.addEventListener("click", () => {
             state.folderPreviewOpen = null
             updateUI()
-        })
-
-        // Export CSV (Legacy ID but using new function)
-        document.querySelector("#yt-sub-export-csv")?.addEventListener("click", () => {
-            if (exportCSV) exportCSV()
         })
 
         // Selection Modal Trigger
@@ -128,15 +189,6 @@
                 const name = el.querySelector(".yt-sub-name")?.textContent?.toLowerCase() || ""
                 el.style.display = name.includes(query) ? "" : "none"
             })
-        })
-
-        // Dropdown event listeners are now managed by attachDropdownListeners() in 5-ui.js
-        // This prevents flickering by using updateDropdownsOnly() instead of full updateUI()
-
-        document.querySelector("[data-show-channels]")?.addEventListener("click", () => {
-            state.showChannels = true
-            saveVisibility()
-            updateUI()
         })
 
         // Folder expand/collapse
