@@ -44,6 +44,78 @@
             updateUI()
         })
 
+        // Toggle dropdown (Settings)
+        document.querySelector("[data-toggle-dropdown]")?.addEventListener("click", (e) => {
+            e.stopPropagation()
+            state.dropdownOpen = !state.dropdownOpen
+            if (state.dropdownOpen) state.exportDropdownOpen = false // Close export if opening settings
+            updateUI()
+        })
+
+        // Dropdown options
+        document.querySelector("[data-toggle-channels]")?.addEventListener("click", () => {
+            state.showChannels = !state.showChannels
+            saveVisibility()
+            updateUI()
+        })
+
+        document.querySelector("[data-toggle-folders]")?.addEventListener("click", () => {
+            state.showFolders = !state.showFolders
+            saveVisibility()
+            updateUI()
+        })
+
+        document.querySelector("[data-toggle-view]")?.addEventListener("click", () => {
+            state.viewMode = state.viewMode === "sidebar" ? "modal" : "sidebar"
+            safeSetLocalStorage("yt-view-mode", state.viewMode)
+            state.dropdownOpen = false
+            updateUI()
+        })
+
+        document.querySelector("[data-show-channels]")?.addEventListener("click", () => {
+            state.showChannels = true
+            saveVisibility()
+            updateUI()
+        })
+
+        // Sidebar position toggle
+        document.querySelector("[data-toggle-position]")?.addEventListener("click", () => {
+            state.sidebarPosition = state.sidebarPosition === "right" ? "left" : "right"
+            safeSetLocalStorage("yt-sidebar-position", state.sidebarPosition)
+            state.dropdownOpen = false
+            updateUI()
+        })
+
+        // Export dropdown toggle
+        document.querySelector("[data-toggle-export-dropdown]")?.addEventListener("click", (e) => {
+            e.stopPropagation()
+            state.exportDropdownOpen = !state.exportDropdownOpen
+            if (state.exportDropdownOpen) state.dropdownOpen = false  // Close settings if opening export
+            updateUI()
+        })
+
+        // Export actions
+        document.querySelectorAll("[data-export]").forEach(el => {
+            el.addEventListener("click", () => {
+                const format = el.getAttribute("data-export")
+                if (exportChannels) exportChannels(format)
+                state.exportDropdownOpen = false
+                updateUI()
+            })
+        })
+
+        // Backup/Restore from dropdown
+        document.querySelector("[data-backup-folders]")?.addEventListener("click", () => {
+            if (backupFolders) backupFolders()
+            state.exportDropdownOpen = false
+            updateUI()
+        })
+        document.querySelector("[data-restore-folders]")?.addEventListener("click", () => {
+            if (restoreFolders) restoreFolders()
+            state.exportDropdownOpen = false
+            updateUI()
+        })
+
         // Open folder preview from modal
         document.querySelectorAll("[data-open-folder-preview]").forEach((el) => {
             el.addEventListener("click", () => {
@@ -56,11 +128,6 @@
         document.querySelector("[data-close-folder-preview]")?.addEventListener("click", () => {
             state.folderPreviewOpen = null
             updateUI()
-        })
-
-        // Export CSV (Legacy ID but using new function)
-        document.querySelector("#yt-sub-export-csv")?.addEventListener("click", () => {
-            if (exportCSV) exportCSV()
         })
 
         // Selection Modal Trigger
@@ -124,42 +191,6 @@
             })
         })
 
-        // Toggle dropdown (Settings)
-        document.querySelector("[data-toggle-dropdown]")?.addEventListener("click", (e) => {
-            e.stopPropagation()
-            state.dropdownOpen = !state.dropdownOpen
-            if (state.dropdownOpen) state.exportDropdownOpen = false // Close export if opening settings
-            updateUI()
-        })
-
-        // Dropdown options
-        document.querySelector("[data-toggle-channels]")?.addEventListener("click", () => {
-            state.showChannels = !state.showChannels
-            saveVisibility()
-            // state.dropdownOpen = false // Optional: keep open for multiple toggles
-            updateUI()
-        })
-
-        document.querySelector("[data-toggle-folders]")?.addEventListener("click", () => {
-            state.showFolders = !state.showFolders
-            saveVisibility()
-            // state.dropdownOpen = false
-            updateUI()
-        })
-
-        document.querySelector("[data-toggle-view]")?.addEventListener("click", () => {
-            state.viewMode = state.viewMode === "sidebar" ? "modal" : "sidebar"
-            safeSetLocalStorage("yt-view-mode", state.viewMode)
-            state.dropdownOpen = false
-            updateUI()
-        })
-
-        document.querySelector("[data-show-channels]")?.addEventListener("click", () => {
-            state.showChannels = true
-            saveVisibility()
-            updateUI()
-        })
-
         // Folder expand/collapse
         document.querySelectorAll("[data-toggle]").forEach((el) => {
             el.addEventListener("click", (e) => {
@@ -184,74 +215,117 @@
             })
         })
 
-        // Channel selection
+        // Channel selection - OPTIMIZED with requestAnimationFrame to prevent flickering
         document.querySelectorAll(".yt-sub-item[data-id]").forEach((el) => {
             el.addEventListener("click", () => {
                 const id = el.getAttribute("data-id")
+
+                // Toggle state
                 if (state.selectedIds.has(id)) {
                     state.selectedIds.delete(id)
                 } else {
                     state.selectedIds.add(id)
                 }
-                updateUI()
+
+                // Use requestAnimationFrame for instant, flicker-free update
+                requestAnimationFrame(() => {
+                    // Update THIS item's visual state
+                    const checkbox = el.querySelector(".yt-sub-checkbox")
+                    const isSelected = state.selectedIds.has(id)
+
+                    if (isSelected) {
+                        el.classList.add("selected")
+                        if (checkbox) checkbox.classList.add("checked")
+                    } else {
+                        el.classList.remove("selected")
+                        if (checkbox) checkbox.classList.remove("checked")
+                    }
+
+                    // Update counter
+                    const counterEl = document.querySelector("#yt-sub-selection-trigger")
+                    if (counterEl) {
+                        const counterText = state.isAutoScrolling
+                            ? `${state.selectedIds.size}/${state.autoScrollProgress.found}...`
+                            : `${state.selectedIds.size}/${state.channels.length}`
+                        counterEl.textContent = counterText
+                    }
+
+                    // Update button states
+                    const selectAllBtn = document.querySelector("#yt-sub-select-all")
+                    if (selectAllBtn) {
+                        selectAllBtn.textContent = state.selectedIds.size === state.channels.length && state.channels.length > 0
+                            ? (window.YTSubI18n?.t('deselect_all') || 'Deselect All')
+                            : (window.YTSubI18n?.t('select_all') || 'Select All')
+                    }
+
+                    const unsubBtn = document.querySelector("#yt-sub-unsubscribe")
+                    if (unsubBtn) {
+                        unsubBtn.disabled = state.selectedIds.size === 0 || state.isProcessing
+                    }
+
+                    const newFolderBtn = document.querySelector("#yt-sub-new-folder")
+                    if (newFolderBtn) {
+                        newFolderBtn.disabled = state.selectedIds.size === 0
+                    }
+                })
             })
         })
 
-        // Mini item selection (APENAS para folder preview - não altera seleção, só visualiza)
+        // Mini item selection (folder preview) - OPTIMIZED with requestAnimationFrame
         document.querySelectorAll(".yt-sub-mini-item[data-id]").forEach((el) => {
             el.addEventListener("click", () => {
                 const id = el.getAttribute("data-id")
-                // Mini items apenas toggleiam a seleção visualmente
+
+                // Toggle state
                 if (state.selectedIds.has(id)) {
                     state.selectedIds.delete(id)
                 } else {
                     state.selectedIds.add(id)
                 }
-                updateUI()
+
+                // Use requestAnimationFrame for instant update
+                requestAnimationFrame(() => {
+                    // Update THIS mini item's visual state
+                    const checkbox = el.querySelector(".yt-sub-checkbox-mini")
+                    const isSelected = state.selectedIds.has(id)
+
+                    if (isSelected) {
+                        el.classList.add("selected")
+                        if (checkbox) checkbox.classList.add("checked")
+                    } else {
+                        el.classList.remove("selected")
+                        if (checkbox) checkbox.classList.remove("checked")
+                    }
+
+                    // Also update the corresponding main item if visible
+                    const mainItem = document.querySelector(`.yt-sub-item[data-id="${id}"]`)
+                    if (mainItem) {
+                        const mainCheckbox = mainItem.querySelector(".yt-sub-checkbox")
+                        if (isSelected) {
+                            mainItem.classList.add("selected")
+                            if (mainCheckbox) mainCheckbox.classList.add("checked")
+                        } else {
+                            mainItem.classList.remove("selected")
+                            if (mainCheckbox) mainCheckbox.classList.remove("checked")
+                        }
+                    }
+
+                    // Update counter
+                    const counterEl = document.querySelector("#yt-sub-selection-trigger")
+                    if (counterEl) {
+                        const counterText = state.isAutoScrolling
+                            ? `${state.selectedIds.size}/${state.autoScrollProgress.found}...`
+                            : `${state.selectedIds.size}/${state.channels.length}`
+                        counterEl.textContent = counterText
+                    }
+                })
             })
         })
 
         // New folder
         document.querySelector("#yt-sub-new-folder")?.addEventListener("click", createNewFolder)
 
-        // Export formats
-        // Export dropdown toggle
-        document.querySelector("[data-toggle-export-dropdown]")?.addEventListener("click", (e) => {
-            e.stopPropagation()
-            state.exportDropdownOpen = !state.exportDropdownOpen
-            if (state.exportDropdownOpen) state.dropdownOpen = false  // Close settings if opening export
-            updateUI()
-        })
-
-        // Export actions
-        document.querySelectorAll("[data-export]").forEach(el => {
-            el.addEventListener("click", () => {
-                const format = el.getAttribute("data-export")
-                if (exportChannels) exportChannels(format)
-                state.exportDropdownOpen = false
-                updateUI()
-            })
-        })
-
-        // Backup/Restore from dropdown
-        document.querySelector("[data-backup-folders]")?.addEventListener("click", () => {
-            if (backupFolders) backupFolders()
-            state.exportDropdownOpen = false
-            updateUI()
-        })
-        document.querySelector("[data-restore-folders]")?.addEventListener("click", () => {
-            if (restoreFolders) restoreFolders()
-            state.exportDropdownOpen = false
-            updateUI()
-        })
-
-        // Sidebar position toggle
-        document.querySelector("[data-toggle-position]")?.addEventListener("click", () => {
-            state.sidebarPosition = state.sidebarPosition === "right" ? "left" : "right"
-            safeSetLocalStorage("yt-sidebar-position", state.sidebarPosition)
-            state.dropdownOpen = false
-            updateUI()
-        })
+        // Export and settings dropdown listeners are now managed by attachDropdownListeners() in 5-ui.js
 
         // Folder tag click → expand and scroll to folder
         document.querySelectorAll(".yt-sub-folder-tag").forEach(tag => {

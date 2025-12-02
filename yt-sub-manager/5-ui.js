@@ -108,7 +108,7 @@
     const selectedChannels = state.channels.filter(c => state.selectedIds.has(c.id))
 
     return `
-      <div class="yt-sub-folders-modal">
+      <div class="yt-sub-selection-modal">
         <div class="yt-sub-folders-modal-content">
           <div class="yt-sub-folders-modal-header">
             <div class="yt-sub-folders-modal-title">
@@ -429,6 +429,71 @@
     }
   }
 
+  // Lightweight update: only update selection states without full re-render
+  function updateSelectionOnly() {
+    const counterText = state.isAutoScrolling
+      ? `${state.selectedIds.size}/${state.autoScrollProgress.found}...`
+      : `${state.selectedIds.size}/${state.channels.length}`
+
+    // Update counter
+    const counterEl = document.querySelector("#yt-sub-selection-trigger")
+    if (counterEl) {
+      counterEl.textContent = counterText
+    }
+
+    // Update all checkboxes and item states
+    document.querySelectorAll(".yt-sub-item[data-id]").forEach((el) => {
+      const id = el.getAttribute("data-id")
+      const isSelected = state.selectedIds.has(id)
+      const checkbox = el.querySelector(".yt-sub-checkbox")
+
+      if (isSelected) {
+        el.classList.add("selected")
+        if (checkbox) checkbox.classList.add("checked")
+      } else {
+        el.classList.remove("selected")
+        if (checkbox) checkbox.classList.remove("checked")
+      }
+    })
+
+    // Update mini items (in folder preview)
+    document.querySelectorAll(".yt-sub-mini-item[data-id]").forEach((el) => {
+      const id = el.getAttribute("data-id")
+      const isSelected = state.selectedIds.has(id)
+      const checkbox = el.querySelector(".yt-sub-checkbox-mini")
+
+      if (isSelected) {
+        el.classList.add("selected")
+        if (checkbox) checkbox.classList.add("checked")
+      } else {
+        el.classList.remove("selected")
+        if (checkbox) checkbox.classList.remove("checked")
+      }
+    })
+
+    // Update select all button text
+    const selectAllBtn = document.querySelector("#yt-sub-select-all")
+    if (selectAllBtn) {
+      const filtered = state.channels
+      selectAllBtn.textContent = state.selectedIds.size === filtered.length && filtered.length > 0
+        ? (window.YTSubI18n?.t('deselect_all') || 'Deselect All')
+        : (window.YTSubI18n?.t('select_all') || 'Select All')
+    }
+
+    // Update unsubscribe button state
+    const unsubBtn = document.querySelector("#yt-sub-unsubscribe")
+    if (unsubBtn) {
+      unsubBtn.disabled = state.selectedIds.size === 0 || state.isProcessing
+    }
+
+    // Update new folder button state
+    const newFolderBtn = document.querySelector("#yt-sub-new-folder")
+    if (newFolderBtn) {
+      newFolderBtn.disabled = state.selectedIds.size === 0
+    }
+  }
+
+
   // Export to global for debounced call in main.js
   window.YTSubUpdateUIInternal = updateUIInternal
 
@@ -438,6 +503,7 @@
     renderFoldersModal,
     renderSelectionModal,
     renderDropdown,
-    updateUIInternal
+    updateUIInternal,
+    updateSelectionOnly
   }
 })()
