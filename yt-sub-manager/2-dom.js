@@ -89,7 +89,7 @@
 
         state.isAutoScrolling = true
         state.autoScrollProgress = { current: 0, total: maxScrolls, found: state.channels.length }
-        updateUI()
+        updateUI()  // First time only - to show loading state
 
         let previousCount = state.channels.length
         let noNewChannels = 0
@@ -101,8 +101,17 @@
         for (let i = 0; i < maxScrolls; i++) {
             state.autoScrollProgress.current = i + 1
             state.autoScrollProgress.found = state.channels.length
-            updateUI()
-            updateStatus(t('loading_progress', { current: i + 1, total: maxScrolls }))
+
+            // Update only status text - NO FULL RE-RENDER
+            const statusEl = document.querySelector("#yt-sub-status")
+            if (statusEl) {
+                statusEl.textContent = t('loading_progress', { current: i + 1, total: maxScrolls })
+            }
+            const loadBtn = document.querySelector("#yt-sub-load-all")
+            if (loadBtn) {
+                loadBtn.textContent = `${icons.loader} ${t('loading_progress', { current: i + 1, total: maxScrolls })}`
+                loadBtn.innerHTML = `${icons.loader} ${t('loading_progress', { current: i + 1, total: maxScrolls })}`
+            }
 
             window.scrollTo({
                 top: document.documentElement.scrollHeight,
@@ -143,7 +152,7 @@
         state.isAutoScrolling = false
         state.autoScrollProgress.found = state.channels.length
         showToast(t('toast_loaded', { count: state.channels.length }))
-        updateUI()
+        updateUI()  // Final update only
     }
 
     async function unsubscribeChannel(channel) {

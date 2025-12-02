@@ -123,6 +123,11 @@
         debouncedUpdateUI()
     }
 
+    // Immediate update without debounce - for lightweight operations
+    function updateUIImmediate() {
+        window.YTSubUpdateUIInternal()
+    }
+
     function escapeHTML(str) {
         if (!str) return ""
         return str
@@ -192,6 +197,7 @@
         getChannelById,
         updateStatus,
         updateUI,
+        updateUIImmediate,
         escapeHTML,
         createNewFolder,
         icons,

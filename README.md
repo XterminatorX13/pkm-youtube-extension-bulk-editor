@@ -7,7 +7,7 @@
 
 **Gerencie e cancele inscrições do YouTube em massa - sem OAuth, sem APIs pagas.**
 
-[Instalação](#-instalação) • [Funcionalidades](#-funcionalidades) • [FAQ](#-faq) • [Segurança](#-segurança)
+[Instalação](#-instalação) • [Funcionalidades](#-funcionalidades) • [FAQ](#-faq)
 
 </div>
 
@@ -26,7 +26,7 @@
 
 ## 📦 Instalação
 
-### Developer Mode (Recomendado)
+### Developer Mode
 
 1. Clone/baixe este repositório
 2. Acesse `chrome://extensions` (Chrome/Edge) ou `about:debugging` (Firefox)
@@ -34,10 +34,6 @@
 4. Clique em **Carregar sem compactação**
 5. Selecione a pasta **`yt-sub-manager`**
 6. Acesse [youtube.com/feed/channels](https://www.youtube.com/feed/channels)
-
-### Chrome Web Store / Firefox Add-ons
-
-*Em breve* - Veja [Como Publicar](#-como-publicar) para contribuir.
 
 ## 💡 Como Usar
 
@@ -85,24 +81,6 @@ Não. O cancelamento é permanente. Por isso recomendamos:
 
 Não. Extensões de navegador funcionam apenas em desktop (Chrome, Firefox, Edge, Brave).
 
-### Por que não está na Chrome Web Store?
-
-Ainda não foi publicada. Você pode:
-- Usar em Developer Mode (100% funcional)
-- Contribuir com a publicação (veja [Como Publicar](#-como-publicar))
-
-## 🔒 Segurança
-
-Esta extensão segue padrões **OWASP 2024** e **Manifest V3**:
-
-- ✅ **XSS Protection:** Sanitização com `escapeHTML()`
-- ✅ **CSP:** `script-src 'self'` (sem eval/inline)
-- ✅ **Permissões mínimas:** Apenas `activeTab` e `storage`
-- ✅ **URL Validation:** Bloqueia open redirects
-- ✅ **No External Data:** Zero chamadas externas
-
-**Auditoria completa:** [Security Report](./SECURITY_AUDIT.md)
-
 ## 🏗️ Arquitetura
 
 Projeto modular com 8 arquivos:
@@ -119,23 +97,6 @@ yt-sub-manager/
 ├── 8-i18n.js          # Traduções
 └── _locales/          # en + pt_BR
 ```
-
-## 🚀 Como Publicar
-
-### Chrome Web Store
-
-1. Pague taxa única de **$5 USD** no [Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard)
-2. Compacte a pasta `yt-sub-manager` (sem `.git`)
-3. Faça upload do ZIP
-4. Preencha Privacy Policy (modelo: "não coletamos dados")
-5. Aguarde revisão (1-3 dias)
-
-### Firefox Add-ons
-
-1. Crie conta no [AMO Developer Hub](https://addons.mozilla.org/developers/)
-2. Use o mesmo ZIP do Chrome
-3. Escolha "Hosted" (loja) ou "Self-Hosted" (distribuição própria)
-4. Aguarde validação automática + revisão humana
 
 ## 🤝 Contribuindo
 

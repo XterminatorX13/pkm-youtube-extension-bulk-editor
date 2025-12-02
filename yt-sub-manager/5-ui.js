@@ -108,7 +108,7 @@
     const selectedChannels = state.channels.filter(c => state.selectedIds.has(c.id))
 
     return `
-      <div class="yt-sub-folders-modal">
+      <div class="yt-sub-selection-modal">
         <div class="yt-sub-folders-modal-content">
           <div class="yt-sub-folders-modal-header">
             <div class="yt-sub-folders-modal-title">

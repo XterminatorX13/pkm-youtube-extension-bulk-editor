@@ -708,6 +708,21 @@
         font-size: 10px;
       }
 
+      /* Selection modal - same styling as folders modal */
+      .yt-sub-selection-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10002;
+        padding: 20px;
+      }
+
       /* Folder preview modal */
       .yt-sub-folder-preview-modal {
         position: fixed;
