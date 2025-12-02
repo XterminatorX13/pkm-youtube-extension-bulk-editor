@@ -1,120 +1,122 @@
-# 📺 YouTube Bulk Editor (Hybrid Edition)
+# 📺 YouTube Bulk Manager
 
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge&logo=youtube)
-![Status](https://img.shields.io/badge/status-stable-green?style=for-the-badge)
-![Security](https://img.shields.io/badge/security-audited-brightgreen?style=for-the-badge&logo=shield)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey?style=for-the-badge)
 
-**A ferramenta definitiva para limpar seu feed do YouTube.**
-*Sem APIs pagas. Sem bloqueios. Sem dor de cabeça.*
+**Gerencie e cancele inscrições do YouTube em massa - sem OAuth, sem APIs pagas.**
 
-[Funcionalidades](#-funcionalidades) • [Instalação](#-instalação) • [Segurança](#-segurança) • [Store Upload](#-como-publicar)
+[Instalação](#-instalação) • [Funcionalidades](#-funcionalidades) • [FAQ](#-faq)
 
 </div>
 
 ---
 
-## 🚀 O Que É Isso?
+## 🚀 Funcionalidades
 
-Cansado de ter 1.000 inscrições que você não assiste mais? O YouTube não te deixa apagar tudo de uma vez. **Nós deixamos.**
+- ✅ **Cancelamento em massa** com proteção anti-rate-limit
+- 📁 **Organize em pastas** com tags visuais clicáveis
+- 🔗 **Links diretos** para canais (hover)
+- 📤 **Export** em CSV, JSON e Markdown
+- 💾 **Backup/Restore** de configurações
+- 🌐 **i18n** (Português + English)
+- 🎨 **Modo sidebar** ou modal
+- 🌙 **Dark mode** nativo
 
-Esta extensão é um "Frankenstein" (no bom sentido!) que combina:
-1.  **UX Premium:** Interface lateral elegante, pastas e modo noturno.
-2.  **Smart Core:** Um algoritmo de "unsubscribe" que age como um humano (pausas, rolagens) para evitar que sua conta seja marcada como spam.
+## 📦 Instalação
 
-## ✨ Funcionalidades
+### Developer Mode
 
-### 🛡️ Smart Unsubscribe (Anti-Ban)
-> "Não é um bug, é uma feature."
-O processo é intencionalmente "lento" (1-2s por canal). Por quê?
-*   **Human-Like Delays:** Espera aleatória entre ações (250ms - 500ms).
-*   **Scroll-to-View:** O script rola até o canal antes de clicar, simulando um usuário real.
-*   **Retry Logic:** Se o YouTube lagar, o script espera pacientemente.
+1. Clone/baixe este repositório
+2. Acesse `chrome://extensions` (Chrome/Edge) ou `about:debugging` (Firefox)
+3. Ative **Modo do Desenvolvedor**
+4. Clique em **Carregar sem compactação**
+5. Selecione a pasta **`yt-sub-manager`**
+6. Acesse [youtube.com/feed/channels](https://www.youtube.com/feed/channels)
 
-### 🎮 Controle Total
-*   **Progress Overlay:** Acompanhe o progresso com uma tela visual estilo "hacker".
-*   **Botão de Pânico:** Clicou em "PARAR"? O script para na hora.
-*   **Mini Modal:** Clique no contador (`3/216`) para ver exatamente quem vai pra vala.
+## 💡 Como Usar
 
-### 📂 Organização
-*   **Pastas:** Agrupe canais que você quer manter (ex: "Tech", "Games").
-*   **Export CSV:** Baixe sua lista completa antes de fazer a limpa. Backup é vida!
-*   **Auto-Scroll:** Carrega sua lista infinita sozinho.
+1. **Vá para** [youtube.com/feed/channels](https://www.youtube.com/feed/channels)
+2. **Clique no ícone** da extensão (canto superior direito)
+3. **Carregue todos** os canais (botão "Carregar Todos")
+4. **Selecione** os canais que deseja cancelar
+5. **Organize** em pastas (opcional)
+6. **Cancele** em massa ou exporte
 
----
+### Dicas
 
-## 📦 Instalação (Developer Mode)
+- **Tags de pasta:** Clique nas tags `📁 Nome` para navegar até a pasta
+- **Link do canal:** Passe o mouse sobre o canal para ver o link
+- **Busca:** Use o campo de pesquisa para filtrar
+- **Export antes de cancelar:** Sempre faça backup!
 
-Como ainda não está na loja (veja abaixo como publicar!), instale assim:
+## ❓ FAQ
 
-1.  **Clone/Baixe** este repositório.
-2.  Acesse `chrome://extensions` (Chrome/Brave/Edge) ou `about:debugging` (Firefox).
-3.  Ative o **Modo do Desenvolvedor**.
-4.  Clique em **Carregar sem compactação** (Load Unpacked).
-5.  Selecione a pasta do projeto.
-6.  Acesse [youtube.com/feed/channels](https://www.youtube.com/feed/channels) e divirta-se!
+### Por que o cancelamento é "lento"?
 
----
+Para evitar rate limiting do YouTube. O script simula comportamento humano com:
+- Delays aleatórios (250-500ms)
+- Scroll até o canal antes de clicar
+- Retry automático em caso de falha
 
-## 🔒 Segurança & Privacidade
+**Recomendação:** Não cancele mais de 100-200 canais por dia.
 
-Levamos a segurança a sério. Esta extensão passou por uma **auditoria de segurança completa** baseada em padrões OWASP 2024.
+### Posso recuperar canais cancelados?
 
-### ✅ Proteções Implementadas
+Não. O cancelamento é permanente. Por isso recomendamos:
+1. Exportar sua lista antes (CSV/JSON)
+2. Organizar em pastas os canais que quer manter
+3. Revisar a seleção antes de confirmar
 
-| Ameaça | Mitigação | Status |
-|--------|-----------|--------|
-| **XSS (Cross-Site Scripting)** | `escapeHTML()` sanitiza todos os dados dinâmicos | ✅ Implementado |
-| **Injeção de Dados** | localStorage com validação e try-catch | ✅ Implementado |
-| **Injeção de Código** | CSP restritivo (`script-src 'self'`) | ✅ Implementado |
-| **Open Redirect** | Validação de URLs do YouTube | ✅ Implementado |
-| **Information Disclosure** | Logs de debug desativados em produção | ✅ Implementado |
+### A extensão coleta dados?
 
-### 🛡️ Padrões de Segurança
+**Não.** Tudo fica no `localStorage` do seu navegador. Não há:
+- ❌ Servidores externos
+- ❌ Analytics
+- ❌ Telemetria
+- ❌ OAuth/APIs pagas
 
-- **Manifest V3:** Atualizado para o novo padrão de segurança do Google
-- **Permissões Mínimas:** Apenas `activeTab`, `storage`, e `youtube.com`
-- **Sem Dados Externos:** Tudo fica no seu navegador (`localStorage`)
-- **OWASP Compliant:** Segue as diretrizes do OWASP Browser Extension Security Project
-- **CSP Explícito:** Bloqueia scripts remotos e eval()
+### Funciona em mobile?
 
-### 📊 Relatório de Auditoria
+Não. Extensões de navegador funcionam apenas em desktop (Chrome, Firefox, Edge, Brave).
 
-**Rating de Segurança:** ✅ **APROVADO PARA PRODUÇÃO**  
-**Compliance:** OWASP ✓ | Chrome Web Store ✓ | Firefox Add-ons ✓
+## 🏗️ Arquitetura
 
-Detalhes completos no [Security Audit Report](https://github.com/XterminatorX13/pkm-youtube-extension-bulk-editor/blob/funcional-experimental-migration-version/SECURITY_AUDIT.md).
+Projeto modular com 8 arquivos:
 
-### ⚠️ Aviso Legal
-Esta ferramenta automatiza ações do usuário. Embora tenhamos implementado proteções (delays), o uso excessivo (milhares de ações por dia) pode chamar atenção do YouTube. Use com moderação (ex: 100-200 por dia).
+```
+yt-sub-manager/
+├── 1-main.js          # Estado global + utils
+├── 2-dom.js           # Scraping + unsubscribe
+├── 3-folders.js       # CRUD de pastas
+├── 4-export.js        # CSV/JSON/MD
+├── 5-ui.js            # Renderização
+├── 6-events.js        # Event listeners
+├── 7-styles.js        # CSS injection
+├── 8-i18n.js          # Traduções
+└── _locales/          # en + pt_BR
+```
 
----
+## 🤝 Contribuindo
 
-## 🚀 Como Publicar (Store Guide)
+PRs são bem-vindos! Áreas prioritárias:
 
-Quer colocar isso na loja? Siga o guia:
+- [ ] Testes automatizados
+- [ ] Seletor de pasta ao criar (dropdown)
+- [ ] Cores customizadas para pastas
+- [ ] Suporte a outros idiomas
 
-### 🟢 Chrome Web Store (CWS)
-1.  **Conta de Desenvolvedor:** Pague a taxa única de $5 USD.
-2.  **Zip:** Compacte a pasta do projeto (sem a pasta `.git`).
-3.  **Dashboard:** Vá para o [Chrome Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard).
-4.  **Upload:** Suba o ZIP.
-5.  **Privacidade:** Preencha a "Privacy Policy". Como não coletamos dados, é simples.
-    *   *Justificativa de Permissões:* Explique que `storage` é para salvar pastas locais e `activeTab` para injetar o script.
-6.  **Review:** Aguarde 1-3 dias.
+## 📄 Licença
 
-### 🦊 Firefox Add-ons (AMO)
-1.  **Conta:** Crie uma conta no [AMO Developer Hub](https://addons.mozilla.org/developers/).
-2.  **Zip:** O mesmo ZIP serve (o Firefox aceita Manifest V3 com algumas ressalvas, mas este projeto é compatível).
-3.  **Upload:** Suba como "Self-Hosted" (para assinar e distribuir você mesmo) ou "Hosted" (para aparecer na loja).
-4.  **Lint:** O validador automático vai checar o código. Se passar, vai para revisão humana.
+MIT License - Veja [LICENSE](./LICENSE)
 
 ---
 
 <div align="center">
 
-**Feito com 💻 e ☕ por XterminatorX13**
+**Feito com 💻 e ☕**
+
+[Report Bug](https://github.com/XterminatorX13/pkm-youtube-extension-bulk-editor/issues) • [Request Feature](https://github.com/XterminatorX13/pkm-youtube-extension-bulk-editor/issues)
 
 </div>

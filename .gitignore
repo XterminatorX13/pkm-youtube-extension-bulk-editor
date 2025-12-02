@@ -1,0 +1,21 @@
+# Backup files
+backup/
+
+# Development
+node_modules/
+.DS_Store
+*.log
+error.log
+
+# Build
+dist/
+build/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
