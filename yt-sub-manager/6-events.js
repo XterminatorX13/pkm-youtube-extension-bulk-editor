@@ -163,40 +163,110 @@
             })
         })
 
-        // Channel selection
+        // Channel selection - OPTIMIZED with requestAnimationFrame to prevent flickering
         document.querySelectorAll(".yt-sub-item[data-id]").forEach((el) => {
             el.addEventListener("click", () => {
                 const id = el.getAttribute("data-id")
+
+                // Toggle state
                 if (state.selectedIds.has(id)) {
                     state.selectedIds.delete(id)
                 } else {
                     state.selectedIds.add(id)
                 }
-                // Use lightweight update to avoid flickering
-                if (window.YTSubUI && window.YTSubUI.updateSelectionOnly) {
-                    window.YTSubUI.updateSelectionOnly()
-                } else {
-                    updateUI()
-                }
+
+                // Use requestAnimationFrame for instant, flicker-free update
+                requestAnimationFrame(() => {
+                    // Update THIS item's visual state
+                    const checkbox = el.querySelector(".yt-sub-checkbox")
+                    const isSelected = state.selectedIds.has(id)
+
+                    if (isSelected) {
+                        el.classList.add("selected")
+                        if (checkbox) checkbox.classList.add("checked")
+                    } else {
+                        el.classList.remove("selected")
+                        if (checkbox) checkbox.classList.remove("checked")
+                    }
+
+                    // Update counter
+                    const counterEl = document.querySelector("#yt-sub-selection-trigger")
+                    if (counterEl) {
+                        const counterText = state.isAutoScrolling
+                            ? `${state.selectedIds.size}/${state.autoScrollProgress.found}...`
+                            : `${state.selectedIds.size}/${state.channels.length}`
+                        counterEl.textContent = counterText
+                    }
+
+                    // Update button states
+                    const selectAllBtn = document.querySelector("#yt-sub-select-all")
+                    if (selectAllBtn) {
+                        selectAllBtn.textContent = state.selectedIds.size === state.channels.length && state.channels.length > 0
+                            ? (window.YTSubI18n?.t('deselect_all') || 'Deselect All')
+                            : (window.YTSubI18n?.t('select_all') || 'Select All')
+                    }
+
+                    const unsubBtn = document.querySelector("#yt-sub-unsubscribe")
+                    if (unsubBtn) {
+                        unsubBtn.disabled = state.selectedIds.size === 0 || state.isProcessing
+                    }
+
+                    const newFolderBtn = document.querySelector("#yt-sub-new-folder")
+                    if (newFolderBtn) {
+                        newFolderBtn.disabled = state.selectedIds.size === 0
+                    }
+                })
             })
         })
 
-        // Mini item selection (APENAS para folder preview - não altera seleção, só visualiza)
+        // Mini item selection (folder preview) - OPTIMIZED with requestAnimationFrame
         document.querySelectorAll(".yt-sub-mini-item[data-id]").forEach((el) => {
             el.addEventListener("click", () => {
                 const id = el.getAttribute("data-id")
-                // Mini items apenas toggleiam a seleção visualmente
+
+                // Toggle state
                 if (state.selectedIds.has(id)) {
                     state.selectedIds.delete(id)
                 } else {
                     state.selectedIds.add(id)
                 }
-                // Use lightweight update to avoid flickering
-                if (window.YTSubUI && window.YTSubUI.updateSelectionOnly) {
-                    window.YTSubUI.updateSelectionOnly()
-                } else {
-                    updateUI()
-                }
+
+                // Use requestAnimationFrame for instant update
+                requestAnimationFrame(() => {
+                    // Update THIS mini item's visual state
+                    const checkbox = el.querySelector(".yt-sub-checkbox-mini")
+                    const isSelected = state.selectedIds.has(id)
+
+                    if (isSelected) {
+                        el.classList.add("selected")
+                        if (checkbox) checkbox.classList.add("checked")
+                    } else {
+                        el.classList.remove("selected")
+                        if (checkbox) checkbox.classList.remove("checked")
+                    }
+
+                    // Also update the corresponding main item if visible
+                    const mainItem = document.querySelector(`.yt-sub-item[data-id="${id}"]`)
+                    if (mainItem) {
+                        const mainCheckbox = mainItem.querySelector(".yt-sub-checkbox")
+                        if (isSelected) {
+                            mainItem.classList.add("selected")
+                            if (mainCheckbox) mainCheckbox.classList.add("checked")
+                        } else {
+                            mainItem.classList.remove("selected")
+                            if (mainCheckbox) mainCheckbox.classList.remove("checked")
+                        }
+                    }
+
+                    // Update counter
+                    const counterEl = document.querySelector("#yt-sub-selection-trigger")
+                    if (counterEl) {
+                        const counterText = state.isAutoScrolling
+                            ? `${state.selectedIds.size}/${state.autoScrollProgress.found}...`
+                            : `${state.selectedIds.size}/${state.channels.length}`
+                        counterEl.textContent = counterText
+                    }
+                })
             })
         })
 
