@@ -493,6 +493,96 @@
     }
   }
 
+  // Lightweight update: only update dropdown states without full re-render
+  function updateDropdownsOnly() {
+    const headerActions = document.querySelector('.yt-sub-header-actions')
+    if (!headerActions) return
+
+    // Re-render only the dropdowns section
+    headerActions.innerHTML = `
+      ${renderDropdown()}
+      <button class="yt-sub-btn-icon" id="yt-sub-close" title="${t('close')}">${icons.close}</button>
+    `
+
+    // Re-attach event listeners for the newly rendered dropdowns
+    attachDropdownListeners()
+  }
+
+  // Helper to attach dropdown-specific event listeners
+  function attachDropdownListeners() {
+    // Close button
+    document.querySelector("#yt-sub-close")?.addEventListener("click", () => {
+      state.panelOpen = false
+      updateUI()
+    })
+
+    // Toggle dropdown (Settings)
+    document.querySelector("[data-toggle-dropdown]")?.addEventListener("click", (e) => {
+      e.stopPropagation()
+      state.dropdownOpen = !state.dropdownOpen
+      if (state.dropdownOpen) state.exportDropdownOpen = false
+      updateDropdownsOnly()
+    })
+
+    // Dropdown options
+    document.querySelector("[data-toggle-channels]")?.addEventListener("click", () => {
+      state.showChannels = !state.showChannels
+      saveVisibility()
+      updateUI()
+    })
+
+    document.querySelector("[data-toggle-folders]")?.addEventListener("click", () => {
+      state.showFolders = !state.showFolders
+      saveVisibility()
+      updateUI()
+    })
+
+    document.querySelector("[data-toggle-view]")?.addEventListener("click", () => {
+      state.viewMode = state.viewMode === "sidebar" ? "modal" : "sidebar"
+      safeSetLocalStorage("yt-view-mode", state.viewMode)
+      state.dropdownOpen = false
+      updateUI()
+    })
+
+    document.querySelector("[data-toggle-position]")?.addEventListener("click", () => {
+      state.sidebarPosition = state.sidebarPosition === "right" ? "left" : "right"
+      safeSetLocalStorage("yt-sidebar-position", state.sidebarPosition)
+      state.dropdownOpen = false
+      updateUI()
+    })
+
+    // Export dropdown toggle
+    document.querySelector("[data-toggle-export-dropdown]")?.addEventListener("click", (e) => {
+      e.stopPropagation()
+      state.exportDropdownOpen = !state.exportDropdownOpen
+      if (state.exportDropdownOpen) state.dropdownOpen = false
+      updateDropdownsOnly()
+    })
+
+    // Export actions
+    document.querySelectorAll("[data-export]").forEach(el => {
+      el.addEventListener("click", () => {
+        const format = el.getAttribute("data-export")
+        if (exportChannels) exportChannels(format)
+        state.exportDropdownOpen = false
+        updateDropdownsOnly()
+      })
+    })
+
+    // Backup/Restore from dropdown
+    document.querySelector("[data-backup-folders]")?.addEventListener("click", () => {
+      if (backupFolders) backupFolders()
+      state.exportDropdownOpen = false
+      updateDropdownsOnly()
+    })
+
+    document.querySelector("[data-restore-folders]")?.addEventListener("click", () => {
+      if (restoreFolders) restoreFolders()
+      state.exportDropdownOpen = false
+      updateDropdownsOnly()
+    })
+  }
+
   // Export to global for debounced call in main.js
   window.YTSubUpdateUIInternal = updateUIInternal
 
@@ -503,6 +593,8 @@
     renderSelectionModal,
     renderDropdown,
     updateUIInternal,
-    updateSelectionOnly
+    updateSelectionOnly,
+    updateDropdownsOnly,
+    attachDropdownListeners
   }
 })()

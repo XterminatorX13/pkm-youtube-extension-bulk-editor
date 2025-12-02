@@ -7,7 +7,13 @@
     const { exportChannels, exportCSV } = window.YTSubExport || {}
 
     function attachEventListeners() {
-        // Close button
+        // Attach dropdown-specific listeners (prevents flickering)
+        if (window.YTSubUI && window.YTSubUI.attachDropdownListeners) {
+            window.YTSubUI.attachDropdownListeners()
+        }
+
+        // Close button - managed by attachDropdownListeners but keeping here as fallback
+
         document.querySelector("#yt-sub-close")?.addEventListener("click", () => {
             state.panelOpen = false
             updateUI()
@@ -124,35 +130,8 @@
             })
         })
 
-        // Toggle dropdown (Settings)
-        document.querySelector("[data-toggle-dropdown]")?.addEventListener("click", (e) => {
-            e.stopPropagation()
-            state.dropdownOpen = !state.dropdownOpen
-            if (state.dropdownOpen) state.exportDropdownOpen = false // Close export if opening settings
-            updateUI()
-        })
-
-        // Dropdown options
-        document.querySelector("[data-toggle-channels]")?.addEventListener("click", () => {
-            state.showChannels = !state.showChannels
-            saveVisibility()
-            // state.dropdownOpen = false // Optional: keep open for multiple toggles
-            updateUI()
-        })
-
-        document.querySelector("[data-toggle-folders]")?.addEventListener("click", () => {
-            state.showFolders = !state.showFolders
-            saveVisibility()
-            // state.dropdownOpen = false
-            updateUI()
-        })
-
-        document.querySelector("[data-toggle-view]")?.addEventListener("click", () => {
-            state.viewMode = state.viewMode === "sidebar" ? "modal" : "sidebar"
-            safeSetLocalStorage("yt-view-mode", state.viewMode)
-            state.dropdownOpen = false
-            updateUI()
-        })
+        // Dropdown event listeners are now managed by attachDropdownListeners() in 5-ui.js
+        // This prevents flickering by using updateDropdownsOnly() instead of full updateUI()
 
         document.querySelector("[data-show-channels]")?.addEventListener("click", () => {
             state.showChannels = true
@@ -224,44 +203,7 @@
         // New folder
         document.querySelector("#yt-sub-new-folder")?.addEventListener("click", createNewFolder)
 
-        // Export formats
-        // Export dropdown toggle
-        document.querySelector("[data-toggle-export-dropdown]")?.addEventListener("click", (e) => {
-            e.stopPropagation()
-            state.exportDropdownOpen = !state.exportDropdownOpen
-            if (state.exportDropdownOpen) state.dropdownOpen = false  // Close settings if opening export
-            updateUI()
-        })
-
-        // Export actions
-        document.querySelectorAll("[data-export]").forEach(el => {
-            el.addEventListener("click", () => {
-                const format = el.getAttribute("data-export")
-                if (exportChannels) exportChannels(format)
-                state.exportDropdownOpen = false
-                updateUI()
-            })
-        })
-
-        // Backup/Restore from dropdown
-        document.querySelector("[data-backup-folders]")?.addEventListener("click", () => {
-            if (backupFolders) backupFolders()
-            state.exportDropdownOpen = false
-            updateUI()
-        })
-        document.querySelector("[data-restore-folders]")?.addEventListener("click", () => {
-            if (restoreFolders) restoreFolders()
-            state.exportDropdownOpen = false
-            updateUI()
-        })
-
-        // Sidebar position toggle
-        document.querySelector("[data-toggle-position]")?.addEventListener("click", () => {
-            state.sidebarPosition = state.sidebarPosition === "right" ? "left" : "right"
-            safeSetLocalStorage("yt-sidebar-position", state.sidebarPosition)
-            state.dropdownOpen = false
-            updateUI()
-        })
+        // Export and settings dropdown listeners are now managed by attachDropdownListeners() in 5-ui.js
 
         // Folder tag click → expand and scroll to folder
         document.querySelectorAll(".yt-sub-folder-tag").forEach(tag => {
